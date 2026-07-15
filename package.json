@@ -1,0 +1,16 @@
+{
+  "name": "formsmith-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:site && npm run test:archery && npm run test:browser",
+    "test:site": "node tests/site-check.mjs",
+    "test:archery": "node syntax-check.cjs && node test-import.mjs && node test-seasons.mjs",
+    "test:production": "node tests/site-check.mjs --production",
+    "test:browser": "node tests/browser-audit.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "24.40.0"
+  }
+}
