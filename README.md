@@ -1,6 +1,6 @@
-# Formsmith marketing site and live demos
+# Formsmith Custom Forms marketing site and live demos
 
-This repository contains the static Formsmith marketing website and the eight interactive software demonstrations it links to. It is built with HTML, CSS, and vanilla JavaScript so it can run directly on GitHub Pages without a build step or paid web host.
+This repository contains the static Formsmith Custom Forms marketing website and the eight interactive software demonstrations it links to. It is built with HTML, CSS, and vanilla JavaScript so it can run directly on GitHub Pages without a build step or paid server.
 
 The marketing site is the repository root. The active demos are included here at their established relative URLs; retired prototypes and their backend setup files are intentionally not part of this production repository.
 
@@ -138,7 +138,7 @@ demo: {
 ```
 
 - Use paths relative to the repository root.
-- Do not begin a path with `/`; GitHub project sites are hosted under a repository subdirectory.
+- Do not begin a path with `/`; GitHub project sites are served from a repository subdirectory.
 - Existing internal demos automatically open in a new tab from marketing cards.
 - If a demo is not ready, use an empty `url` and `placeholder: true`. The renderer displays a non-clickable “Demo coming soon” control instead of a dead `#` link.
 
@@ -255,16 +255,13 @@ Because all internal assets use relative paths, the site works from that project
 
 Do not add a manual `<base>` element. Relative paths are what allow the site to work both under the GitHub project path and a future custom domain.
 
-## Placeholder values still to replace
+## Launch values still to configure
 
 Search the central configuration for `REPLACE_ME`, `REPLACE-ME`, `000)`, and `isPlaceholder`.
 
-Before launch, confirm or replace:
+The email address, click-to-call number, Facebook page, Etsy shop, and Milwaukee location label are configured centrally. Before launch, confirm or replace:
 
-- final email address;
-- final phone number and click-to-call value;
-- Facebook Messenger page URL and label;
-- final service-area wording;
+- final service-area wording, if it should be more specific than Milwaukee;
 - custom domain and the current GitHub Pages canonical/Open Graph URLs, if applicable;
 - contact and quote form endpoints/provider settings;
 - privacy provider, retention, contact process, and legal review;

@@ -1,5 +1,5 @@
 /**
- * Formsmith website content and configuration.
+ * Formsmith Custom Forms website content and configuration.
  *
  * Repository-relative paths intentionally have no leading slash so the site works
  * from a GitHub Pages project URL and from a future custom domain. Shared renderers
@@ -10,11 +10,11 @@
  */
 window.FORMSMITH_DATA = {
   site: {
-    name: "Formsmith",
+    name: "Formsmith Custom Forms",
     tagline: "Forged to order.",
     headline: "Custom business software built around the way you already work.",
     description:
-      "Formsmith builds practical custom business software that helps small businesses replace frustrating spreadsheets, paper forms, and disconnected workflows.",
+      "Formsmith Custom Forms builds practical custom business software that helps small businesses replace frustrating spreadsheets, paper forms, and disconnected workflows.",
     locale: "en_US",
     language: "en",
     faviconPath: "assets/favicon.svg",
@@ -25,23 +25,30 @@ window.FORMSMITH_DATA = {
     customDomain: "", // REPLACE_ME when a custom domain is connected.
 
     contact: {
-      // REPLACE_ME: add final contact details before publishing.
-      email: "hello@REPLACE-ME.example",
-      phoneDisplay: "(000) 000-0000",
-      phoneHref: "",
-      facebookMessengerUrl: "",
-      facebookMessengerLabel: "Message Formsmith on Facebook",
-      locationLabel: "Service area to be confirmed",
+      email: "formsmithcustomforms@gmail.com",
+      phoneDisplay: "(414) 395-5816",
+      phoneHref: "+14143955816",
+      facebookUrl: "https://www.facebook.com/FormsmithCustomForms/",
+      facebookLabel: "Formsmith Custom Forms on Facebook",
+      etsyUrl: "https://www.etsy.com/shop/FormsmithCustomForms",
+      etsyLabel: "Formsmith Custom Forms on Etsy",
+      locationLabel: "",
       address: null,
-      isPlaceholder: true
+      isPlaceholder: false
     },
 
     socialLinks: [
       {
         service: "Facebook",
-        label: "Formsmith on Facebook",
-        url: "", // REPLACE_ME
-        isPlaceholder: true
+        label: "Formsmith Custom Forms on Facebook",
+        url: "https://www.facebook.com/FormsmithCustomForms/",
+        isPlaceholder: false
+      },
+      {
+        service: "Etsy",
+        label: "Formsmith Custom Forms on Etsy",
+        url: "https://www.etsy.com/shop/FormsmithCustomForms",
+        isPlaceholder: false
       }
     ],
 
@@ -55,7 +62,7 @@ window.FORMSMITH_DATA = {
           "Preview mode: your quote request was not sent. Quote submissions will be connected before the site is published.",
         successTitle: "Thank you for telling us about your project.",
         successMessage:
-          "Your request was sent successfully. Formsmith will review the details and follow up using the contact information you provided."
+          "Your request was sent successfully. Formsmith Custom Forms will review the details and follow up using the contact information you provided."
       },
       contact: {
         mode: "development", // development | endpoint
@@ -66,12 +73,12 @@ window.FORMSMITH_DATA = {
           "Preview mode: your message was not sent. Contact submissions will be connected before the site is published.",
         successTitle: "Message sent.",
         successMessage:
-          "Thank you for contacting Formsmith. Your message was sent successfully."
+          "Thank you for contacting Formsmith Custom Forms. Your message was sent successfully."
       },
       privacy: {
         policyVersion: "2026-07-14",
         consentLabel:
-          "I agree that Formsmith may use the information in this request to respond about my project.",
+          "I agree that Formsmith Custom Forms may use the information in this request to respond about my project.",
         policyPath: "privacy.html",
         storageNotice:
           "Form entries remain in the page only while you complete the form and are not saved to local storage."
@@ -86,10 +93,10 @@ window.FORMSMITH_DATA = {
     { label: "Pricing", path: "pricing.html", page: "pricing" },
     { label: "About", path: "about.html", page: "about" },
     { label: "FAQ", path: "faq.html", page: "faq" },
-    { label: "Contact", path: "contact.html", page: "contact" },
+    { label: "Contact", path: "contact.html#contact-form", page: "contact" },
     {
       label: "Request a Quote",
-      path: "quote.html",
+      path: "quote.html#quote-form",
       page: "quote",
       isPrimaryCta: true
     }
@@ -733,14 +740,14 @@ window.FORMSMITH_DATA = {
 
   faqs: [
     {
-      question: "What does Formsmith build?",
+      question: "What does Formsmith Custom Forms build?",
       answer:
-        "Formsmith builds practical custom business software such as customer managers, scheduling tools, quote and job trackers, inventory systems, operational forms, dashboards, reports, document workflows, and Google Sheets-powered business apps. The exact screens and features are shaped around the way each business works."
+        "Formsmith Custom Forms builds practical custom business software such as customer managers, scheduling tools, quote and job trackers, inventory systems, operational forms, dashboards, reports, document workflows, and Google Sheets-powered business apps. The exact screens and features are shaped around the way each business works."
     },
     {
-      question: "Who is Formsmith for?",
+      question: "Who is Formsmith Custom Forms for?",
       answer:
-        "Formsmith is focused on small businesses, solo entrepreneurs, contractors, local service companies, and teachers who have outgrown spreadsheets, paper forms, or a collection of disconnected tools. Businesses with larger teams are welcome to request a quote so the scope can be evaluated."
+        "Formsmith Custom Forms is focused on small businesses, solo entrepreneurs, contractors, local service companies, and teachers who have outgrown spreadsheets, paper forms, or a collection of disconnected tools. Businesses with larger teams are welcome to request a quote so the scope can be evaluated."
     },
     {
       question: "Can you replace my spreadsheet?",
@@ -765,7 +772,7 @@ window.FORMSMITH_DATA = {
     {
       question: "How much does a project cost?",
       answer:
-        "Formsmith caps every custom build budget at $5,000. Each project is still quoted individually based on the workflow, screens, data, automation, reporting, mobile use, revisions, and support involved. Any third-party hosting, service, or optional ongoing-support costs will be identified separately before work begins. The initial quote request is free."
+        "Each project is quoted individually based on the workflow, screens, data, automation, reporting, mobile use, revisions, and support involved. If a larger idea needs to be divided into focused phases, that will be discussed before work begins. Any third-party service or optional ongoing-support costs will be identified separately. The initial quote request is free."
     },
     {
       question: "How long does a project take?",
@@ -790,17 +797,17 @@ window.FORMSMITH_DATA = {
     {
       question: "Will I own my business data?",
       answer:
-        "Yes. You will own your business data. The project agreement will document how you can access or export it, along with any project-specific storage, hosting, or third-party service responsibilities."
+        "Yes. You will own your business data. The project agreement will document how you can access or export it, along with any project-specific storage or third-party service responsibilities."
     },
     {
       question: "Will I own the software and source code?",
       answer:
-        "Your business data belongs to you. Ownership or licensing of the application, source code, reusable Formsmith components, hosting setup, and handoff materials is a separate matter that will be stated clearly in the project agreement before work begins."
+        "Your business data belongs to you. Ownership or licensing of the application, source code, reusable Formsmith components, and handoff materials is a separate matter that will be stated clearly in the project agreement before work begins."
     },
     {
       question: "Does Formsmith provide support after launch?",
       answer:
-        "Post-launch support may be available depending on the project. Any included support period, maintenance work, response expectations, hosting responsibilities, and ongoing costs will be described in the proposal or a separate support arrangement."
+        "Post-launch support may be available depending on the project. Any included support period, maintenance work, response expectations, and ongoing costs will be described in the proposal or a separate support arrangement."
     },
     {
       question: "Can you build software for an industry not listed on the site?",
@@ -869,7 +876,8 @@ window.FORMSMITH_DATA = {
       { value: "not-sure", label: "I am not sure yet" },
       { value: "under-1000", label: "Under $1,000" },
       { value: "1000-2499", label: "$1,000-$2,499" },
-      { value: "2500-5000", label: "$2,500-$5,000" }
+      { value: "2500-4999", label: "$2,500-$4,999" },
+      { value: "5000-plus", label: "$5,000+" }
     ]
   }
 };

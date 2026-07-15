@@ -3,7 +3,7 @@
 
   const data = window.FORMSMITH_DATA;
   if (!data) {
-    console.error("Formsmith site data did not load.");
+    console.error("Formsmith Custom Forms site data did not load.");
     return;
   }
 
@@ -46,6 +46,7 @@
       phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.7 19.7 0 0 1-8.6-3.1 19.3 19.3 0 0 1-6-6A19.7 19.7 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c1 .3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/>',
       search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
       spark: '<path d="m12 2 1.5 5.2L19 9l-5.5 1.8L12 16l-1.5-5.2L5 9l5.5-1.8z"/>',
+      store: '<path d="M4 10v10h16V10M3 4h18l-1 6a3 3 0 0 1-5 1 3 3 0 0 1-6 0 3 3 0 0 1-5-1Z"/><path d="M9 20v-5h6v5"/>',
       users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
       wrench: '<path d="M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l8.4 8.4a2.1 2.1 0 0 1-3 3Z"/>'
     };
@@ -66,16 +67,16 @@
     mount.innerHTML = `
       <header class="site-header">
         <div class="header-inner shell">
-          <a class="brand" href="${resolvePath("index.html")}" aria-label="Formsmith home">
+          <a class="brand" href="${resolvePath("index.html")}" aria-label="${escapeHtml(data.site.name)} home">
             ${brandMark()}
-            <span class="brand-copy"><strong>Formsmith</strong><small>Forged to order.</small></span>
+            <span class="brand-copy"><strong>${escapeHtml(data.site.name)}</strong><small>Forged to order.</small></span>
           </a>
           <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation menu">
             <span class="menu-open">${icon("menu")}</span><span class="menu-close">${icon("close")}</span>
           </button>
           <nav class="primary-nav" id="primary-navigation" aria-label="Primary navigation">
             <div class="nav-links">${links}</div>
-            <a class="button button--small nav-cta" href="${resolvePath("quote.html")}">Request a Quote ${icon("arrow")}</a>
+            <a class="button button--small nav-cta" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a>
           </nav>
         </div>
       </header>`;
@@ -123,14 +124,20 @@
     const mount = document.querySelector("[data-site-footer]");
     if (!mount) return;
     const contact = data.site.contact;
-    const contactLine = contact.isPlaceholder
-      ? '<p class="config-note">Contact details will be added before launch.</p>'
-      : `<p class="footer-email"><a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></p>`;
+    const footerContactOptions = [
+      { label: contact.email, href: `mailto:${contact.email}` },
+      { label: contact.phoneDisplay, href: `tel:${contact.phoneHref}` },
+      { label: "Facebook", href: contact.facebookUrl, external: true },
+      { label: "Etsy", href: contact.etsyUrl, external: true }
+    ].filter((item) => item.label && item.href && !/^(?:mailto:|tel:)$/i.test(item.href));
+    const contactLine = footerContactOptions.length
+      ? `<ul class="footer-contact-links">${footerContactOptions.map((item) => `<li><a href="${escapeHtml(item.href)}"${item.external ? ' target="_blank" rel="noopener noreferrer"' : ""}>${escapeHtml(item.label)}</a></li>`).join("")}</ul>`
+      : "";
     mount.innerHTML = `
       <footer class="site-footer">
         <div class="shell footer-grid">
           <div class="footer-brand">
-            <a class="brand brand--footer" href="${resolvePath("index.html")}">${brandMark()}<span class="brand-copy"><strong>Formsmith</strong><small>Forged to order.</small></span></a>
+            <a class="brand brand--footer" href="${resolvePath("index.html")}">${brandMark()}<span class="brand-copy"><strong>${escapeHtml(data.site.name)}</strong><small>Forged to order.</small></span></a>
             <p>Practical custom business software shaped around the way your small business already works.</p>
           </div>
           <div>
@@ -139,16 +146,16 @@
           </div>
           <div>
             <h2 class="footer-heading">Company</h2>
-            <ul class="footer-links"><li><a href="${resolvePath("about.html")}">About Formsmith</a></li><li><a href="${resolvePath("faq.html")}">Frequently asked questions</a></li><li><a href="${resolvePath("contact.html")}">Contact</a></li><li><a href="${resolvePath("privacy.html")}">Privacy</a></li></ul>
+            <ul class="footer-links"><li><a href="${resolvePath("about.html")}">About Formsmith Custom Forms</a></li><li><a href="${resolvePath("faq.html")}">Frequently asked questions</a></li><li><a href="${resolvePath("contact.html#contact-form")}">Contact</a></li><li><a href="${resolvePath("privacy.html")}">Privacy</a></li></ul>
           </div>
           <div>
             <h2 class="footer-heading">Start a conversation</h2>
             <p class="footer-contact">Tell us what is slowing the business down. The initial quote request is free.</p>
-            <a class="text-link" href="${resolvePath("quote.html")}">Request a Quote ${icon("arrow")}</a>
+            <a class="text-link" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a>
             ${contactLine}
           </div>
         </div>
-        <div class="shell footer-bottom"><p>&copy; <span data-current-year></span> Formsmith. All rights reserved.</p><p>Custom software for practical work.</p></div>
+        <div class="shell footer-bottom"><p>&copy; <span data-current-year></span> Formsmith Custom Forms. All rights reserved.</p><p>Custom software for practical work.</p></div>
       </footer>`;
   }
 
@@ -258,7 +265,7 @@
     const detailMount = document.querySelector("[data-industry-details]");
     if (detailMount) {
       detailMount.innerHTML = data.industries.map((industry, index) => `<article class="industry-detail reveal" id="${escapeHtml(industry.slug)}">
-        <div class="industry-detail__intro"><span class="number">${String(index + 1).padStart(2, "0")}</span><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h2>${escapeHtml(industry.name)}</h2><p>${escapeHtml(industry.longDescription || industry.summary)}</p><a class="text-link" href="${resolvePath("quote.html")}">Discuss your workflow ${icon("arrow")}</a></div>
+        <div class="industry-detail__intro"><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h2>${escapeHtml(industry.name)}</h2><p>${escapeHtml(industry.longDescription || industry.summary)}</p><a class="text-link" href="${resolvePath("quote.html#quote-form")}">Discuss your workflow ${icon("arrow")}</a></div>
         <div class="industry-detail__examples"><h3>What Formsmith might build</h3><ul class="check-grid">${industry.examples.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}</ul></div>
       </article>`).join("");
     }
@@ -294,20 +301,20 @@
             <h1>${escapeHtml(project.title)}</h1>
             <p class="lede">${escapeHtml(project.summary)}</p>
             ${project.demo?.notice ? `<div class="demo-notice"><strong>Demo note:</strong> ${escapeHtml(project.demo.notice)} Please do not enter real or sensitive information.</div>` : ""}
-            <div class="button-row">${demoAction(project)}<a class="button button--ghost" href="${resolvePath("quote.html")}">Request Something Similar ${icon("arrow")}</a></div>
+            <div class="button-row">${demoAction(project)}<a class="button button--ghost" href="${resolvePath("quote.html#quote-form")}">Request Something Similar ${icon("arrow")}</a></div>
           </div>
           ${projectVisual(project, true)}
         </div>
       </section>
       <section class="section"><div class="shell narrative-grid">
-        <article><span class="section-label">01 / Overview</span><h2>Project overview</h2><p>${escapeHtml(project.overview || project.summary)}</p></article>
-        <article><span class="section-label">02 / The challenge</span><h2>The business problem</h2><p>${escapeHtml(project.problem)}</p></article>
-        <article><span class="section-label">03 / Starting point</span><h2>${previousHeading}</h2><p>${escapeHtml(project.previousProcess)}</p></article>
-        <article><span class="section-label">04 / The system</span><h2>${solutionHeading}</h2><p>${escapeHtml(project.solution)}</p></article>
+        <article><span class="section-label">Overview</span><h2>Project overview</h2><p>${escapeHtml(project.overview || project.summary)}</p></article>
+        <article><span class="section-label">The challenge</span><h2>The business problem</h2><p>${escapeHtml(project.problem)}</p></article>
+        <article><span class="section-label">Starting point</span><h2>${previousHeading}</h2><p>${escapeHtml(project.previousProcess)}</p></article>
+        <article><span class="section-label">The system</span><h2>${solutionHeading}</h2><p>${escapeHtml(project.solution)}</p></article>
       </div></section>
-      <section class="section section--tint"><div class="shell split-heading"><div><div class="eyebrow">Built for the work</div><h2>Key capabilities</h2></div><p>Every feature is included because it supports the workflow—not because it fills a generic software checklist.</p></div><div class="shell feature-grid">${project.features.map((feature, index) => `<div class="feature-tile"><span>${String(index + 1).padStart(2, "0")}</span><h3>${escapeHtml(feature)}</h3></div>`).join("")}</div></section>
+      <section class="section section--tint"><div class="shell split-heading"><div><div class="eyebrow">Built for the work</div><h2>Key capabilities</h2></div><p>Every feature is included because it supports the workflow—not because it fills a generic software checklist.</p></div><div class="shell feature-grid">${project.features.map((feature) => `<div class="feature-tile"><span class="feature-tile__icon">${icon("check")}</span><h3>${escapeHtml(feature)}</h3></div>`).join("")}</div></section>
       <section class="section"><div class="shell"><div class="split-heading"><div><div class="eyebrow">Interface preview</div><h2>See the system in context</h2></div><p>${screenshots.length ? "Real interface screens from the current build or demonstration." : "A layout preview until final project imagery is ready."}</p></div><div class="screenshot-grid">${screenshots.length ? screenshots.map((shot) => `<figure><img src="${resolvePath(shot.src)}" alt="${escapeHtml(shot.alt)}" width="${shot.width || 1920}" height="${shot.height || 946}" loading="lazy" decoding="async"><figcaption>${escapeHtml(shot.caption || project.title)}</figcaption></figure>`).join("") : projectVisual(project)}</div></div></section>
-      <section class="section section--cta"><div class="shell cta-panel"><div><div class="eyebrow eyebrow--light">Have a similar bottleneck?</div><h2>Your workflow deserves its own system.</h2><p>Tell Formsmith what you are managing today and what needs to work better.</p></div><a class="button button--light" href="${resolvePath("quote.html")}">Request a Quote ${icon("arrow")}</a></div></section>`;
+      <section class="section section--cta"><div class="shell cta-panel"><div><div class="eyebrow eyebrow--light">Have a similar bottleneck?</div><h2>Your workflow deserves its own system.</h2><p>Tell Formsmith what you are managing today and what needs to work better.</p></div><a class="button button--light" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a></div></section>`;
   }
 
   function renderContactDetails() {
@@ -316,13 +323,14 @@
     const contact = data.site.contact;
     const options = [
       { icon: "email", label: "Email", value: contact.email, href: `mailto:${contact.email}` },
-      { icon: "message", label: "Facebook Messenger", value: contact.facebookMessengerLabel || "Message Formsmith", href: contact.facebookMessengerUrl },
-      { icon: "phone", label: "Phone", value: contact.phoneDisplay, href: `tel:${contact.phoneHref}` }
+      { icon: "phone", label: "Phone", value: contact.phoneDisplay, href: `tel:${contact.phoneHref}` },
+      { icon: "message", label: "Facebook", value: contact.facebookLabel || "Formsmith Custom Forms on Facebook", href: contact.facebookUrl, external: true },
+      { icon: "store", label: "Etsy", value: contact.etsyLabel || "Formsmith Custom Forms on Etsy", href: contact.etsyUrl, external: true }
     ];
     mount.innerHTML = options.map((item) => {
       const isPlaceholder = contact.isPlaceholder || !item.href || /^(?:tel:|mailto:)$/i.test(item.href) || /YOUR_|REPLACE-ME|000\)/i.test(item.value) || /YOUR_|REPLACE-ME/i.test(item.href);
       if (isPlaceholder) return `<div class="contact-option contact-option--placeholder"><span>${icon(item.icon)}</span><div><small>${escapeHtml(item.label)}</small><strong>${escapeHtml(item.label)} details coming soon</strong><em>Not an active contact channel yet</em></div></div>`;
-      return `<a class="contact-option" href="${escapeHtml(item.href)}"${item.icon === "message" ? ' target="_blank" rel="noopener noreferrer"' : ""}><span>${icon(item.icon)}</span><div><small>${escapeHtml(item.label)}</small><strong>${escapeHtml(item.value)}</strong></div>${icon("arrow")}</a>`;
+      return `<a class="contact-option" href="${escapeHtml(item.href)}"${item.external ? ' target="_blank" rel="noopener noreferrer"' : ""}><span>${icon(item.icon)}</span><div><small>${escapeHtml(item.label)}</small><strong>${escapeHtml(item.value)}</strong></div>${icon("arrow")}</a>`;
     }).join("");
   }
 
@@ -353,7 +361,7 @@
         const payload = Object.fromEntries(new FormData(form).entries());
         const privacy = data.site.forms.privacy || {};
         payload.submittedAt = new Date().toISOString();
-        payload.source = "Formsmith general inquiry form";
+        payload.source = "Formsmith Custom Forms general inquiry form";
         payload.privacyPolicyPath = privacy.policyPath || "privacy.html";
         payload.privacyPolicyVersion = privacy.policyVersion || "unversioned";
         payload.privacyConsentRecordedAt = payload.submittedAt;

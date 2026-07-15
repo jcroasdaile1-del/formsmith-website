@@ -121,6 +121,9 @@ async function inspectPage(page, scope, viewport) {
     if (!document.querySelector("header.site-header")) issues.push("shared header did not render");
     if (!document.querySelector("footer.site-footer")) issues.push("shared footer did not render");
     if (!document.querySelector("main#main-content")) issues.push("main landmark is missing");
+    const headerBrand = document.querySelector("header .brand-copy strong")?.textContent.trim();
+    const footerBrand = document.querySelector("footer .brand-copy strong")?.textContent.trim();
+    if (headerBrand !== "Formsmith Custom Forms" || footerBrand !== "Formsmith Custom Forms") issues.push(`full brand is missing from header or footer (${headerBrand} / ${footerBrand})`);
 
     const headings = [...document.querySelectorAll("h1")].filter(visible);
     if (headings.length !== 1) issues.push(`expected one visible h1, found ${headings.length}`);
@@ -388,6 +391,20 @@ async function testFaqOwnership(browser, origin) {
 async function testContactForm(browser, origin) {
   const page = await browser.newPage();
   await page.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  const contactLinks = await page.$$eval("[data-contact-options] a", (links) => links.map((link) => link.href));
+  const expectedContactLinks = [
+    "mailto:formsmithcustomforms@gmail.com",
+    "tel:+14143955816",
+    "https://www.facebook.com/FormsmithCustomForms/",
+    "https://www.etsy.com/shop/FormsmithCustomForms"
+  ];
+  for (const href of expectedContactLinks) {
+    if (!contactLinks.includes(href)) fail("contact options", `missing active link ${href}`);
+  }
+  const footerLinks = await page.$$eval(".footer-contact-links a", (links) => links.map((link) => link.href));
+  for (const href of expectedContactLinks) {
+    if (!footerLinks.includes(href)) fail("footer contact options", `missing active link ${href}`);
+  }
   await page.click('[data-contact-form] button[type="submit"]');
   const invalidBefore = await page.$eval("[data-contact-form]", (form) => !form.checkValidity());
   if (!invalidBefore) fail("contact form", "empty required form unexpectedly passed validation");
@@ -435,9 +452,9 @@ async function testQuoteWizard(browser, origin) {
   const initialStorage = await page.evaluate(() => localStorage.length);
 
   const budgetOptions = await page.$$eval("#budget-range option", (items) => items.map((item) => ({ value: item.value, label: item.textContent.trim() })));
-  const expectedBudgets = ["Choose a range or leave blank", "I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$5,000"];
+  const expectedBudgets = ["Choose a range or leave blank", "I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
   if (JSON.stringify(budgetOptions.map((item) => item.label)) !== JSON.stringify(expectedBudgets)) fail("quote wizard", `unexpected budget options: ${budgetOptions.map((item) => item.label).join(" | ")}`);
-  if (budgetOptions.some((item) => /(?:[6-9]|\d{2,}),?\d{3}/.test(item.label.replace("5,000", "")))) fail("quote wizard", "budget options include a value above $5,000");
+  if (budgetOptions.at(-1)?.label !== "$5,000+" || budgetOptions.at(-1)?.value !== "5000-plus") fail("quote wizard", "budget options do not end with an active $5,000+ choice");
 
   await page.click("[data-next-step]");
   if (await page.$$eval("[data-form-step]", (steps) => steps.findIndex((step) => !step.hidden)) !== 0) fail("quote wizard", "empty first step advanced");
@@ -462,7 +479,7 @@ async function testQuoteWizard(browser, origin) {
   await page.click('[data-form-step]:not([hidden]) [data-next-step]');
 
   await page.select("#ideal-start", "within-1-month");
-  await page.select("#budget-range", "2500-5000");
+  await page.select("#budget-range", "5000-plus");
   const minDate = await page.$eval("#target-date", (input) => input.min);
   const today = await page.evaluate(() => {
     const date = new Date();
@@ -477,7 +494,7 @@ async function testQuoteWizard(browser, origin) {
     text: document.querySelector("[data-review-list]").textContent,
     progress: document.querySelectorAll("[data-progress-step].is-active").length
   }));
-  if (review.step !== 4 || review.sections !== 4 || !review.text.includes("$2,500-$5,000") || review.progress !== 1) fail("quote wizard", `review state is incomplete (${JSON.stringify(review)})`);
+  if (review.step !== 4 || review.sections !== 4 || !review.text.includes("$5,000+") || review.progress !== 1) fail("quote wizard", `review state is incomplete (${JSON.stringify(review)})`);
 
   await page.click('[data-edit-step="3"]');
   if (await page.$$eval("[data-form-step]", (steps) => steps.findIndex((step) => !step.hidden)) !== 3) fail("quote wizard", "review Edit button did not return to expectations");
@@ -514,8 +531,41 @@ async function testQuoteWizard(browser, origin) {
   }, `${origin}/quote-capture`);
   await page.click("[data-submit-quote]");
   await page.waitForFunction(() => !document.querySelector("[data-quote-success]").hidden, { timeout: 5000 });
-  if (capturedMethod !== "POST" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
+  if (capturedMethod !== "POST" || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
     fail("quote wizard", `endpoint payload omitted method or consent evidence (${JSON.stringify({ capturedMethod, capturedPayload })})`);
+  }
+  await page.close();
+}
+
+async function testFormAnchors(browser, origin) {
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 720 });
+  await page.goto(`${origin}${mountPath}index.html`, { waitUntil: "load" });
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "load" }),
+    page.click(".nav-cta")
+  ]);
+  await new Promise((resolve) => setTimeout(resolve, 450));
+  const quoteState = await page.evaluate(() => {
+    const header = document.querySelector(".site-header").getBoundingClientRect();
+    const target = document.querySelector("#quote-form").getBoundingClientRect();
+    return { hash: location.hash, headerBottom: header.bottom, targetTop: target.top };
+  });
+  if (quoteState.hash !== "#quote-form" || quoteState.targetTop < quoteState.headerBottom || quoteState.targetTop > quoteState.headerBottom + 48) {
+    fail("quote form anchor", `CTA did not align the form below the sticky header (${JSON.stringify(quoteState)})`);
+  }
+
+  await page.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  await page.click('a[href="#contact-form"]');
+  await page.waitForFunction(() => location.hash === "#contact-form");
+  await new Promise((resolve) => setTimeout(resolve, 450));
+  const contactState = await page.evaluate(() => {
+    const header = document.querySelector(".site-header").getBoundingClientRect();
+    const target = document.querySelector("#contact-form").getBoundingClientRect();
+    return { hash: location.hash, headerBottom: header.bottom, targetTop: target.top };
+  });
+  if (contactState.targetTop < contactState.headerBottom || contactState.targetTop > contactState.headerBottom + 48) {
+    fail("contact form anchor", `CTA did not align the form below the sticky header (${JSON.stringify(contactState)})`);
   }
   await page.close();
 }
@@ -568,6 +618,8 @@ try {
   await testContactForm(browser, origin);
   console.log("Running quote wizard end-to-end…");
   await testQuoteWizard(browser, origin);
+  console.log("Running direct form-anchor checks…");
+  await testFormAnchors(browser, origin);
   console.log("Running no-JavaScript and GitHub Pages prefix checks…");
   await testNoScriptAndPrefix(browser, origin);
 
@@ -587,7 +639,7 @@ try {
   } else {
     console.log(`Browser audit passed ${pages.length} pages across ${viewports.length} light and ${darkViewports.length} dark responsive viewports.`);
     console.log(`Demo smoke tests passed ${demoPages.length} applications across ${demoViewports.length} responsive viewports.`);
-    console.log("Interactions passed: navigation, breakpoint/theme regressions, portfolio filters, FAQ ownership, contact form, quote wizard, no-JavaScript fallback, and GitHub Pages subpath.");
+    console.log("Interactions passed: navigation, breakpoint/theme regressions, portfolio filters, FAQ ownership, contact form, quote wizard, form anchors, no-JavaScript fallback, and GitHub Pages subpath.");
     console.log(`Contact layout samples: ${contactSnapshots.map((item) => `${item.colorScheme}/${item.viewport}=${Math.round(item.headingWidth)}px`).join(", ")}`);
     console.log(`Contact screenshot: ${screenshot}`);
   }

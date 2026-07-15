@@ -78,7 +78,7 @@
         heading.focus({ preventScroll: true });
       }
       const wizardTop = document.querySelector(".quote-card");
-      if (wizardTop && wizardTop.getBoundingClientRect().top < 0) wizardTop.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+      if (wizardTop) wizardTop.scrollIntoView({ behavior: "instant", block: "start" });
     }
   }
 
@@ -198,7 +198,7 @@
       }
     }
     payload.submittedAt = new Date().toISOString();
-    payload.source = "Formsmith quote wizard";
+    payload.source = "Formsmith Custom Forms quote wizard";
     payload.privacyPolicyPath = data.site.forms.privacy.policyPath;
     payload.privacyPolicyVersion = data.site.forms.privacy.policyVersion;
     payload.privacyConsentRecordedAt = payload.submittedAt;

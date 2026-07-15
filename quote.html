@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Request a Custom Software Quote | Formsmith</title>
-  <meta name="description" content="Tell Formsmith what is slowing your business down. Use the free guided quote request to describe your workflow and custom software needs.">
+  <title>Request a Custom Software Quote | Formsmith Custom Forms</title>
+  <meta name="description" content="Tell Formsmith Custom Forms what is slowing your business down. Use the free guided quote request to describe your workflow and custom software needs.">
   <link rel="canonical" href="https://jcroasdaile1-del.github.io/formsmith-website/quote.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Request a Custom Software Quote | Formsmith">
-  <meta property="og:description" content="Start with the process that is not working. Formsmith will help explore what a better custom system could look like.">
+  <meta property="og:title" content="Request a Custom Software Quote | Formsmith Custom Forms">
+  <meta property="og:description" content="Start with the process that is not working. Formsmith Custom Forms will help explore what a better custom system could look like.">
   <meta property="og:url" content="https://jcroasdaile1-del.github.io/formsmith-website/quote.html">
   <meta name="theme-color" content="#173f4d">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -31,16 +31,16 @@
           <div class="progress-heading"><span>Your quote request</span><strong>Five clear steps</strong></div>
           <div class="progress-track" aria-hidden="true"><span data-progress-bar></span></div>
           <ol>
-            <li data-progress-step><span>1</span><div><strong>Business</strong><small>Who you are</small></div></li>
-            <li data-progress-step><span>2</span><div><strong>Current process</strong><small>What is not working</small></div></li>
-            <li data-progress-step><span>3</span><div><strong>Desired solution</strong><small>What may help</small></div></li>
-            <li data-progress-step><span>4</span><div><strong>Expectations</strong><small>Timing and context</small></div></li>
-            <li data-progress-step><span>5</span><div><strong>Review</strong><small>Confirm your answers</small></div></li>
+            <li data-progress-step><span class="progress-symbol" aria-hidden="true"></span><div><strong>Business</strong><small>Who you are</small></div></li>
+            <li data-progress-step><span class="progress-symbol" aria-hidden="true"></span><div><strong>Current process</strong><small>What is not working</small></div></li>
+            <li data-progress-step><span class="progress-symbol" aria-hidden="true"></span><div><strong>Desired solution</strong><small>What may help</small></div></li>
+            <li data-progress-step><span class="progress-symbol" aria-hidden="true"></span><div><strong>Expectations</strong><small>Timing and context</small></div></li>
+            <li data-progress-step><span class="progress-symbol" aria-hidden="true"></span><div><strong>Review</strong><small>Confirm your answers</small></div></li>
           </ol>
           <div class="progress-help"><span>Not sure about an answer?</span><p>Use your best estimate or choose “I am not sure.” The form starts a conversation; it does not lock the project scope.</p></div>
         </aside>
 
-        <div class="quote-card">
+        <div class="quote-card" id="quote-form">
           <div class="notice-box form-availability" data-quote-availability hidden></div>
           <form data-quote-wizard>
             <section class="form-step" data-form-step aria-labelledby="quote-step-1-title">
@@ -87,7 +87,7 @@
                 <div class="field"><label for="ideal-start">When would you ideally like to begin? <span aria-hidden="true">*</span></label><select id="ideal-start" name="idealStart" data-select-options="startTimeframes" data-placeholder="Choose a timeframe" required></select></div>
                 <div class="field"><label for="target-date">Is there a target completion date? <span class="optional">Optional</span></label><input id="target-date" name="targetCompletionDate" type="date"></div>
               </div>
-              <div class="field"><label for="budget-range">Approximate build budget <span class="optional">Optional</span></label><select id="budget-range" name="budgetRange" data-select-options="budgetRanges" data-placeholder="Choose a range or leave blank"></select><small>Custom build budgets are capped at $5,000. This estimate helps frame options but does not make the final quote.</small></div>
+              <div class="field"><label for="budget-range">Approximate build budget <span class="optional">Optional</span></label><select id="budget-range" name="budgetRange" data-select-options="budgetRanges" data-placeholder="Choose a range or leave blank"></select><small>This estimate helps frame the options and scope; it does not determine the final quote.</small></div>
               <div class="field"><label for="additional-notes">Is there anything else Formsmith should know? <span class="optional">Optional</span></label><textarea id="additional-notes" name="additionalNotes" rows="6" maxlength="3000" placeholder="Important deadlines, existing data, special terminology, workflow details, or questions…"></textarea></div>
               <div class="expectation-note"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><p>A requested date is helpful context, not a guaranteed delivery commitment. Schedule and scope are discussed before work begins.</p></div>
               <div class="form-actions"><button class="button button--ghost" type="button" data-previous-step>Back</button><button class="button" type="button" data-next-step>Review Your Request</button></div>
@@ -96,7 +96,7 @@
             <section class="form-step" data-form-step aria-labelledby="quote-step-5-title" hidden>
               <div class="form-step__heading"><span>Step 5 of 5</span><h2 id="quote-step-5-title">Review your quote request.</h2><p>Check the answers below. Use any Edit button to return to that section.</p></div>
               <div class="review-list" data-review-list></div>
-              <div class="privacy-agreement"><label for="privacy-agreement"><input id="privacy-agreement" name="privacyAgreement" type="checkbox" value="agreed" required><span class="choice-control" aria-hidden="true"></span><span>I agree that Formsmith may use the information in this request to respond about my project. I have read the <a href="privacy.html" target="_blank" rel="noopener">privacy notice<span class="visually-hidden"> (opens in a new tab)</span></a>.</span></label><p>This site does not save unfinished answers in localStorage.</p></div>
+              <div class="privacy-agreement"><label for="privacy-agreement"><input id="privacy-agreement" name="privacyAgreement" type="checkbox" value="agreed" required><span class="choice-control" aria-hidden="true"></span><span>I agree that Formsmith Custom Forms may use the information in this request to respond about my project. I have read the <a href="privacy.html" target="_blank" rel="noopener">privacy notice<span class="visually-hidden"> (opens in a new tab)</span></a>.</span></label><p>This site does not save unfinished answers in localStorage.</p></div>
               <div class="form-actions"><button class="button button--ghost" type="button" data-previous-step>Back</button><button class="button" type="submit" data-submit-quote>Submit Quote Request</button></div>
               <div class="form-status" data-quote-status role="status" aria-live="polite" tabindex="-1"></div>
             </section>

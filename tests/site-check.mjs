@@ -53,7 +53,10 @@ for (const page of pages) {
   const title = html.match(/<title>([^<]+)<\/title>/i)?.[1]?.trim();
   if (!title) fail(page, "missing title");
   else if (titles.has(title)) fail(page, `duplicates title used by ${titles.get(title)}`);
-  else titles.set(title, page);
+  else {
+    titles.set(title, page);
+    if (!/Formsmith Custom Forms/.test(title)) fail(page, "title does not use the full Formsmith Custom Forms brand");
+  }
 
   if (page !== "404.html") {
     if (!/<meta\s+name="description"\s+content="[^"]+"/i.test(html)) fail(page, "missing meta description");
@@ -121,13 +124,20 @@ if (/YOUR-DOMAIN|REPLACE[_-]?ME/i.test(sitemap)) fail("sitemap.xml", "contains a
 if (!data) fail("assets/js/site-data.js", "does not define window.FORMSMITH_DATA");
 else {
   if (!Array.isArray(data.projects) || data.projects.length < 1) fail("assets/js/site-data.js", "must define at least one project");
+  if (data.site?.name !== "Formsmith Custom Forms") fail("assets/js/site-data.js", "primary site name must be Formsmith Custom Forms");
   if (data.industries.length !== 11) fail("assets/js/site-data.js", `expected 11 industries, found ${data.industries.length}`);
   if (data.faqs.length < 14) fail("assets/js/site-data.js", `expected at least 14 FAQs, found ${data.faqs.length}`);
   if (!data.faqs.some((faq) => faq.question === "Will I own my business data?" && /^Yes\. You will own your business data\./.test(faq.answer))) {
     fail("assets/js/site-data.js", "business-data ownership FAQ must provide an explicit yes");
   }
   const budgetLabels = data.quoteOptions.budgetRanges.map((option) => option.label);
-  if (budgetLabels.some((label) => /\$(?:[6-9],\d{3}|\d{2,},\d{3})/.test(label))) fail("assets/js/site-data.js", "budget range exceeds $5,000");
+  const expectedBudgets = ["I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
+  if (JSON.stringify(budgetLabels) !== JSON.stringify(expectedBudgets)) fail("assets/js/site-data.js", `unexpected budget ranges: ${budgetLabels.join(" | ")}`);
+  if (budgetLabels.at(-1) !== "$5,000+") fail("assets/js/site-data.js", "budget ranges must end with $5,000+");
+  const contact = data.site.contact;
+  if (contact.email !== "formsmithcustomforms@gmail.com" || contact.phoneHref !== "+14143955816" || contact.facebookUrl !== "https://www.facebook.com/FormsmithCustomForms/" || contact.etsyUrl !== "https://www.etsy.com/shop/FormsmithCustomForms" || contact.isPlaceholder) {
+    fail("assets/js/site-data.js", "configured email, phone, Facebook, Etsy, or placeholder status is incorrect");
+  }
   for (const project of data.projects) {
     for (const [label, target] of [["detail", project.detailPath], ["demo", project.demo?.url]]) {
       if (target && !localTargetExists("index.html", target)) fail("assets/js/site-data.js", `${project.slug} has broken ${label} path: ${target}`);
@@ -152,8 +162,8 @@ else {
 
 if (productionMode && data) {
   const contact = data.site.contact;
-  if (contact.isPlaceholder || !contact.email || !contact.phoneHref || !contact.facebookMessengerUrl) {
-    fail("assets/js/site-data.js", "production mode requires active email, phone, Messenger, and isPlaceholder=false");
+  if (contact.isPlaceholder || !contact.email || !contact.phoneHref || !contact.facebookUrl || !contact.etsyUrl) {
+    fail("assets/js/site-data.js", "production mode requires active email, phone, Facebook, Etsy, and isPlaceholder=false");
   }
   for (const [name, form] of Object.entries(data.site.forms).filter(([name]) => name !== "privacy")) {
     if (form.mode !== "endpoint" || !form.endpoint) fail("assets/js/site-data.js", `production mode requires a configured ${name} endpoint`);
@@ -176,6 +186,14 @@ const quote = fs.readFileSync(path.join(root, "quote.html"), "utf8");
 if ((quote.match(/\bdata-form-step\b/g) || []).length !== 5) fail("quote.html", "quote wizard must have exactly 5 form steps");
 if ((quote.match(/\bdata-progress-step\b/g) || []).length !== 5) fail("quote.html", "quote wizard must have exactly 5 progress steps");
 if (!/name="privacyAgreement"[^>]*required/.test(quote)) fail("quote.html", "privacy agreement is not required");
+if (!/class="quote-card"\s+id="quote-form"/.test(quote)) fail("quote.html", "quote form anchor is missing");
+
+const contactPage = fs.readFileSync(path.join(root, "contact.html"), "utf8");
+if (/How should we address you\?|Where should we reply\?/i.test(contactPage)) fail("contact.html", "removed contact helper prompt is still present");
+if (!/class="form-card"\s+id="contact-form"/.test(contactPage)) fail("contact.html", "contact form anchor is missing");
+
+const marketingCopy = ["index.html", "demos.html", "pricing.html", "faq.html", "privacy.html", "quote.html"].map((page) => fs.readFileSync(path.join(root, page), "utf8")).join("\n");
+if (/\bhost(?:ing|ed|s)?\b/i.test(`${marketingCopy}\n${dataSource}`)) fail("marketing copy", "still refers to hosting");
 
 if (errors.length) {
   console.error(`Site check failed with ${errors.length} issue${errors.length === 1 ? "" : "s"}:`);
