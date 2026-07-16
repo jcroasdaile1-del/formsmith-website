@@ -339,7 +339,7 @@ async function testBreakpointAndThemeRegressions(browser, origin) {
   await page.close();
 }
 
-async function testNested404(browser, origin) {
+async function testCustomDomain404(browser, origin) {
   const page = await browser.newPage();
   const response = await page.goto(`${origin}${mountPath}missing/deep/path`, { waitUntil: "load" });
   const state = await page.evaluate(() => ({
@@ -349,8 +349,8 @@ async function testNested404(browser, origin) {
     home: document.querySelector(".not-found a")?.getAttribute("href"),
     overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
   }));
-  if (response?.status() !== 404 || state.h1 !== "We could not find that page." || !state.header || !state.styled || state.home !== `${mountPath}index.html` || state.overflow) {
-    fail("nested 404", `project-root assets or links failed (${JSON.stringify({ status: response?.status(), ...state })})`);
+  if (response?.status() !== 404 || state.h1 !== "We could not find that page." || !state.header || !state.styled || state.home !== "/index.html" || state.overflow) {
+    fail("custom-domain 404", `root assets or links failed (${JSON.stringify({ status: response?.status(), ...state })})`);
   }
   await page.close();
 }
@@ -391,6 +391,40 @@ async function testFaqOwnership(browser, origin) {
 async function testContactForm(browser, origin) {
   const page = await browser.newPage();
   await page.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  const contactConfig = await page.evaluate(() => ({
+    mode: window.FORMSMITH_DATA.site.forms.contact.mode,
+    provider: window.FORMSMITH_DATA.site.forms.contact.provider,
+    endpoint: window.FORMSMITH_DATA.site.forms.contact.endpoint,
+    availabilityHidden: document.querySelector("[data-contact-availability]").hidden
+  }));
+  if (contactConfig.mode !== "endpoint" || contactConfig.provider !== "formspree" || !contactConfig.endpoint || !contactConfig.availabilityHidden) {
+    fail("contact form", `production endpoint is not active (${JSON.stringify(contactConfig)})`);
+  }
+  let capturedPayload = null;
+  let capturedMethod = null;
+  let capturedAccept = null;
+  let capturedContentType = null;
+  await page.setRequestInterception(true);
+  page.on("request", async (request) => {
+    if (request.url() === contactConfig.endpoint) {
+      const corsHeaders = {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "POST, OPTIONS",
+        "access-control-allow-headers": "Accept, Content-Type"
+      };
+      if (request.method() === "OPTIONS") {
+        await request.respond({ status: 204, headers: corsHeaders, body: "" });
+        return;
+      }
+      capturedMethod = request.method();
+      capturedAccept = request.headers().accept;
+      capturedContentType = request.headers()["content-type"];
+      capturedPayload = Object.fromEntries(new URLSearchParams(request.postData() || ""));
+      await request.respond({ status: 200, contentType: "application/json", headers: corsHeaders, body: "{}" });
+    } else {
+      await request.continue();
+    }
+  });
   const contactLinks = await page.$$eval("[data-contact-options] a", (links) => links.map((link) => link.href));
   const expectedContactLinks = [
     "mailto:formsmithcustomforms@gmail.com",
@@ -414,34 +448,15 @@ async function testContactForm(browser, origin) {
   await page.type("#contact-message", "This is a complete browser-audit test message.");
   await page.$eval("#contact-privacy-agreement", (input) => input.click());
   await page.click('[data-contact-form] button[type="submit"]');
+  await page.waitForFunction(() => document.querySelector("[data-form-status]").classList.contains("form-status--success"), { timeout: 5000 });
   const state = await page.evaluate(() => ({
     valid: document.querySelector("[data-contact-form]").checkValidity(),
     status: document.querySelector("[data-form-status]").textContent.trim(),
-    development: document.querySelector("[data-form-status]").classList.contains("form-status--development")
+    success: document.querySelector("[data-form-status]").classList.contains("form-status--success")
   }));
-  if (!state.valid || !state.development || !/not sent/i.test(state.status)) fail("contact form", `preview submission did not clearly remain unsent (${JSON.stringify(state)})`);
-
-  let capturedPayload = null;
-  let capturedMethod = null;
-  await page.setRequestInterception(true);
-  page.on("request", async (request) => {
-    if (request.url() === `${origin}/contact-capture`) {
-      capturedMethod = request.method();
-      capturedPayload = JSON.parse(request.postData() || "{}");
-      await request.respond({ status: 200, contentType: "application/json", body: "{}" });
-    } else {
-      await request.continue();
-    }
-  });
-  await page.evaluate((endpoint) => {
-    const config = window.FORMSMITH_DATA.site.forms.contact;
-    config.mode = "endpoint";
-    config.endpoint = endpoint;
-  }, `${origin}/contact-capture`);
-  await page.click('[data-contact-form] button[type="submit"]');
-  await page.waitForFunction(() => document.querySelector("[data-form-status]").classList.contains("form-status--success"), { timeout: 5000 });
-  if (capturedMethod !== "POST" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
-    fail("contact form", `endpoint payload omitted method or consent evidence (${JSON.stringify({ capturedMethod, capturedPayload })})`);
+  if (!state.success || !/sent/i.test(state.status)) fail("contact form", `production submission did not show success (${JSON.stringify(state)})`);
+  if (capturedMethod !== "POST" || capturedAccept !== "application/json" || !capturedContentType?.includes("application/x-www-form-urlencoded") || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
+    fail("contact form", `endpoint payload omitted method, response header, form encoding, or consent evidence (${JSON.stringify({ capturedMethod, capturedAccept, capturedContentType, capturedPayload })})`);
   }
   await page.close();
 }
@@ -450,6 +465,40 @@ async function testQuoteWizard(browser, origin) {
   const page = await browser.newPage();
   await page.goto(`${origin}${mountPath}quote.html`, { waitUntil: "load" });
   const initialStorage = await page.evaluate(() => localStorage.length);
+  const quoteConfig = await page.evaluate(() => ({
+    mode: window.FORMSMITH_DATA.site.forms.quote.mode,
+    provider: window.FORMSMITH_DATA.site.forms.quote.provider,
+    endpoint: window.FORMSMITH_DATA.site.forms.quote.endpoint,
+    availabilityHidden: document.querySelector("[data-quote-availability]").hidden
+  }));
+  if (quoteConfig.mode !== "endpoint" || quoteConfig.provider !== "formspree" || !quoteConfig.endpoint || !quoteConfig.availabilityHidden) {
+    fail("quote wizard", `production endpoint is not active (${JSON.stringify(quoteConfig)})`);
+  }
+  let capturedPayload = null;
+  let capturedMethod = null;
+  let capturedAccept = null;
+  let capturedContentType = null;
+  await page.setRequestInterception(true);
+  page.on("request", async (request) => {
+    if (request.url() === quoteConfig.endpoint) {
+      const corsHeaders = {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "POST, OPTIONS",
+        "access-control-allow-headers": "Accept, Content-Type"
+      };
+      if (request.method() === "OPTIONS") {
+        await request.respond({ status: 204, headers: corsHeaders, body: "" });
+        return;
+      }
+      capturedMethod = request.method();
+      capturedAccept = request.headers().accept;
+      capturedContentType = request.headers()["content-type"];
+      capturedPayload = Object.fromEntries(new URLSearchParams(request.postData() || ""));
+      await request.respond({ status: 200, contentType: "application/json", headers: corsHeaders, body: "{}" });
+    } else {
+      await request.continue();
+    }
+  });
 
   const budgetOptions = await page.$$eval("#budget-range option", (items) => items.map((item) => ({ value: item.value, label: item.textContent.trim() })));
   const expectedBudgets = ["Choose a range or leave blank", "I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
@@ -504,35 +553,15 @@ async function testQuoteWizard(browser, origin) {
   if (!invalidPrivacy) fail("quote wizard", "privacy agreement is not enforced");
   await page.$eval("#privacy-agreement", (input) => input.click());
   await page.click("[data-submit-quote]");
+  await page.waitForFunction(() => !document.querySelector("[data-quote-success]").hidden, { timeout: 5000 });
   const finalState = await page.evaluate(() => ({
-    status: document.querySelector("[data-quote-status]").textContent.trim(),
-    development: document.querySelector("[data-quote-status]").classList.contains("form-status--development"),
     successHidden: document.querySelector("[data-quote-success]").hidden,
+    formHidden: document.querySelector("[data-quote-wizard]").hidden,
     storage: localStorage.length
   }));
-  if (!finalState.development || !/not sent/i.test(finalState.status) || !finalState.successHidden || finalState.storage !== initialStorage) fail("quote wizard", `preview submission state is unsafe (${JSON.stringify({ ...finalState, initialStorage })})`);
-
-  let capturedPayload = null;
-  let capturedMethod = null;
-  await page.setRequestInterception(true);
-  page.on("request", async (request) => {
-    if (request.url() === `${origin}/quote-capture`) {
-      capturedMethod = request.method();
-      capturedPayload = JSON.parse(request.postData() || "{}");
-      await request.respond({ status: 200, contentType: "application/json", body: "{}" });
-    } else {
-      await request.continue();
-    }
-  });
-  await page.evaluate((endpoint) => {
-    const config = window.FORMSMITH_DATA.site.forms.quote;
-    config.mode = "endpoint";
-    config.endpoint = endpoint;
-  }, `${origin}/quote-capture`);
-  await page.click("[data-submit-quote]");
-  await page.waitForFunction(() => !document.querySelector("[data-quote-success]").hidden, { timeout: 5000 });
-  if (capturedMethod !== "POST" || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
-    fail("quote wizard", `endpoint payload omitted method or consent evidence (${JSON.stringify({ capturedMethod, capturedPayload })})`);
+  if (finalState.successHidden || !finalState.formHidden || finalState.storage !== initialStorage) fail("quote wizard", `production submission state is incomplete (${JSON.stringify({ ...finalState, initialStorage })})`);
+  if (capturedMethod !== "POST" || capturedAccept !== "application/json" || !capturedContentType?.includes("application/x-www-form-urlencoded") || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
+    fail("quote wizard", `endpoint payload omitted method, response header, form encoding, or consent evidence (${JSON.stringify({ capturedMethod, capturedAccept, capturedContentType, capturedPayload })})`);
   }
   await page.close();
 }
@@ -608,8 +637,8 @@ try {
   await testMobileNavigation(browser, origin);
   console.log("Running breakpoint and theme regression checks…");
   await testBreakpointAndThemeRegressions(browser, origin);
-  console.log("Running nested GitHub Pages 404 check…");
-  await testNested404(browser, origin);
+  console.log("Running custom-domain 404 check…");
+  await testCustomDomain404(browser, origin);
   console.log("Running portfolio filter interaction…");
   await testPortfolioFilters(browser, origin);
   console.log("Running FAQ ownership check…");

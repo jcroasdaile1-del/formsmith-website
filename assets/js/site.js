@@ -13,7 +13,8 @@
 
   function resolvePath(path) {
     if (!path || /^(?:[a-z]+:|#)/i.test(path)) return path || "";
-    return `${base}/${path}`.replace(/\/\.\//g, "/");
+    const normalizedBase = base === "/" ? "" : base.replace(/\/+$/, "");
+    return `${normalizedBase}/${path}`.replace(/\/\.\//g, "/");
   }
 
   function escapeHtml(value) {
@@ -365,7 +366,16 @@
         payload.privacyPolicyPath = privacy.policyPath || "privacy.html";
         payload.privacyPolicyVersion = privacy.policyVersion || "unversioned";
         payload.privacyConsentRecordedAt = payload.submittedAt;
-        const response = await fetch(config.endpoint, { method: config.method || "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const requestBody = new URLSearchParams();
+        Object.entries(payload).forEach(([key, value]) => {
+          if (Array.isArray(value)) value.forEach((item) => requestBody.append(key, item));
+          else requestBody.append(key, value);
+        });
+        const response = await fetch(config.endpoint, {
+          method: config.method || "POST",
+          headers: { "Accept": "application/json" },
+          body: requestBody
+        });
         if (!response.ok) throw new Error("Submission failed");
         form.reset();
         status.className = "form-status form-status--success";

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Update these URLs if a custom domain is connected. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/demos.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/portfolio.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/industries.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/pricing.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/about.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/faq.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/contact.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/quote.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/privacy.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/equipment-rental-manager.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/powerwash-pro.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/dog-grooming-manager.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/house-cleaning-manager.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/travel-agency-manager.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/archery-league-manager.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/teacher-tracker.html</loc></url>
-  <url><loc>https://jcroasdaile1-del.github.io/formsmith-website/projects/equipment-inventory-profit-tracker.html</loc></url>
+  <url><loc>https://getformsmith.com/</loc></url>
+  <url><loc>https://getformsmith.com/demos.html</loc></url>
+  <url><loc>https://getformsmith.com/portfolio.html</loc></url>
+  <url><loc>https://getformsmith.com/industries.html</loc></url>
+  <url><loc>https://getformsmith.com/pricing.html</loc></url>
+  <url><loc>https://getformsmith.com/about.html</loc></url>
+  <url><loc>https://getformsmith.com/faq.html</loc></url>
+  <url><loc>https://getformsmith.com/contact.html</loc></url>
+  <url><loc>https://getformsmith.com/quote.html</loc></url>
+  <url><loc>https://getformsmith.com/privacy.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/equipment-rental-manager.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/powerwash-pro.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/dog-grooming-manager.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/house-cleaning-manager.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/travel-agency-manager.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/archery-league-manager.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/teacher-tracker.html</loc></url>
+  <url><loc>https://getformsmith.com/projects/equipment-inventory-profit-tracker.html</loc></url>
 </urlset>

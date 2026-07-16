@@ -144,26 +144,26 @@ demo: {
 
 ## Connect the forms
 
-Both forms ship in development mode. They validate and the quote wizard builds a complete review, but no information is transmitted. When a visitor presses submit, the site explicitly says that the information was not sent.
+Both forms submit through the public Formspree endpoint configured in `assets/js/site-data.js`. The general inquiry and quote wizard include a source label and privacy-consent evidence in each JSON submission.
 
 Configuration is isolated in `assets/js/site-data.js`:
 
 ```js
 forms: {
   quote: {
-    mode: "development", // change to "endpoint" when ready
-    provider: "none",
-    endpoint: ""
+    mode: "endpoint",
+    provider: "formspree",
+    endpoint: "https://formspree.io/f/xqerelbq"
   },
   contact: {
-    mode: "development",
-    provider: "none",
-    endpoint: ""
+    mode: "endpoint",
+    provider: "formspree",
+    endpoint: "https://formspree.io/f/xqerelbq"
   }
 }
 ```
 
-To connect Google Apps Script, Formspree, or another service:
+To change to Google Apps Script or another service:
 
 1. Create and test the public form endpoint.
 2. Review its CORS rules and expected request format.
@@ -219,7 +219,7 @@ Before a production launch, also review at these widths in a real browser:
 - keyboard-only navigation;
 - reduced-motion mode.
 
-Test the mobile menu, every portfolio filter, every demo link, contact-form validation, all quote wizard Back/Continue/Edit controls, an empty quote submission, and development-mode submission messaging. A Lighthouse pass in Chrome is also recommended.
+Test the mobile menu, every portfolio filter, every demo link, contact-form validation, all quote wizard Back/Continue/Edit controls, and mocked production submissions. A Lighthouse pass in Chrome is also recommended.
 
 ## Deploy with GitHub Pages
 
@@ -236,35 +236,23 @@ This repository is deployment-compatible with GitHub Pages from the repository r
 For this repository, the current Pages URL is:
 
 ```text
-https://jcroasdaile1-del.github.io/formsmith-website/
+https://getformsmith.com/
 ```
 
 Because all internal assets use relative paths, the site works from that project URL. The existing demo routes remain inside the same repository.
 
-## Connect a custom domain later
+## Custom domain
 
-1. Buy or choose the domain.
-2. Follow GitHub's current Pages instructions for the required DNS records.
-3. Add the domain in **Settings → Pages → Custom domain** and enable HTTPS after DNS is valid.
-4. Update `customDomain` and `canonicalBaseUrl` in `assets/js/site-data.js`.
-5. Replace `https://jcroasdaile1-del.github.io/formsmith-website/` in every marketing/project HTML file, `sitemap.xml`, and `robots.txt` with the final HTTPS origin.
-6. Update Open Graph image URLs if the asset path changes.
-7. Change the project-root paths in `404.html` if the repository path changes; use `/` when a custom domain serves the site from the domain root.
-8. Confirm GitHub's generated `CNAME` file is committed if applicable.
-9. Re-run both validation scripts and inspect the deployed canonical URLs.
+The production domain is `https://getformsmith.com/`. GitHub Pages uses the committed `CNAME` file, marketing and project canonical URLs use the custom domain, and the 404 page resolves assets from the domain root. If the domain changes, update `customDomain`, `canonicalBaseUrl`, canonical/Open Graph URLs, `sitemap.xml`, `robots.txt`, `CNAME`, and the root paths in `404.html`, then rerun the production and browser checks.
 
 Do not add a manual `<base>` element. Relative paths are what allow the site to work both under the GitHub project path and a future custom domain.
 
-## Launch values still to configure
+## Optional post-launch updates
 
-Search the central configuration for `REPLACE_ME`, `REPLACE-ME`, `000)`, and `isPlaceholder`.
+The contact channels, Formspree endpoint, privacy-provider wording, and custom domain are configured. Remaining optional improvements include:
 
-The email address, click-to-call number, Facebook page, Etsy shop, and Milwaukee location label are configured centrally. Before launch, confirm or replace:
-
-- final service-area wording, if it should be more specific than Milwaukee;
-- custom domain and the current GitHub Pages canonical/Open Graph URLs, if applicable;
-- contact and quote form endpoints/provider settings;
-- privacy provider, retention, contact process, and legal review;
+- final service-area wording;
+- periodic legal review of the privacy notice and record-retention practices;
 - final logo, favicon, and brand imagery;
 - dedicated screenshots for Travel Agency Manager, Teacher Tracker, and Equipment Inventory and Profit Tracker;
 - project statuses, descriptions, technologies, and demo notices;

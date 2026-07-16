@@ -37,6 +37,7 @@ function localTargetExists(page, target) {
   let clean = target.split("#")[0].split("?")[0];
   if (!clean || /^(?:[a-z]+:|\/\/)/i.test(clean)) return true;
   if (clean.startsWith("/formsmith-website/")) clean = clean.slice("/formsmith-website/".length);
+  else if (clean.startsWith("/")) clean = clean.slice(1);
   let candidate = path.resolve(root, path.dirname(page), clean);
   if (clean.endsWith("/")) candidate = path.join(candidate, "index.html");
   if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) candidate = path.join(candidate, "index.html");
@@ -162,6 +163,17 @@ else {
 
 if (productionMode && data) {
   const contact = data.site.contact;
+  if (!data.site.customDomain || data.site.canonicalBaseUrl !== data.site.customDomain) {
+    fail("assets/js/site-data.js", "production mode requires matching customDomain and canonicalBaseUrl values");
+  }
+  for (const page of pages.filter((page) => page !== "404.html")) {
+    const html = fs.readFileSync(path.join(root, page), "utf8");
+    const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1] || "";
+    const openGraphUrl = html.match(/<meta\s+property="og:url"\s+content="([^"]+)"/i)?.[1] || "";
+    if (!canonical.startsWith(data.site.customDomain) || !openGraphUrl.startsWith(data.site.customDomain)) {
+      fail(page, "production canonical and Open Graph URLs must use the configured custom domain");
+    }
+  }
   if (contact.isPlaceholder || !contact.email || !contact.phoneHref || !contact.facebookUrl || !contact.etsyUrl) {
     fail("assets/js/site-data.js", "production mode requires active email, phone, Facebook, Etsy, and isPlaceholder=false");
   }

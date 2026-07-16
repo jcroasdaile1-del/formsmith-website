@@ -205,6 +205,15 @@
     return payload;
   }
 
+  function encodePayload(payload) {
+    const requestBody = new URLSearchParams();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (Array.isArray(value)) value.forEach((item) => requestBody.append(key, item));
+      else requestBody.append(key, value);
+    });
+    return requestBody;
+  }
+
   async function submitQuote() {
     status.className = "form-status";
     const config = data.site.forms.quote;
@@ -226,8 +235,8 @@
     try {
       const response = await fetch(config.endpoint, {
         method: config.method || "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(serializeForm())
+        headers: { "Accept": "application/json" },
+        body: encodePayload(serializeForm())
       });
       if (!response.ok) throw new Error(`Submission returned ${response.status}`);
       form.hidden = true;

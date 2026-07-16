@@ -5,8 +5,8 @@
  * from a GitHub Pages project URL and from a future custom domain. Shared renderers
  * should resolve these paths against the current page's data-base value.
  *
- * Replace the clearly marked contact, social, form endpoint, and domain values
- * before publishing. Never place API keys or other secrets in this file.
+ * Public form endpoints and domain values belong here. Never place API keys or
+ * other secrets in this file.
  */
 window.FORMSMITH_DATA = {
   site: {
@@ -21,8 +21,8 @@ window.FORMSMITH_DATA = {
 
     // Update these if the repository name changes or when a custom domain is connected.
     githubPagesUrl: "https://jcroasdaile1-del.github.io/formsmith-website/",
-    canonicalBaseUrl: "https://jcroasdaile1-del.github.io/formsmith-website/",
-    customDomain: "", // REPLACE_ME when a custom domain is connected.
+    canonicalBaseUrl: "https://getformsmith.com/",
+    customDomain: "https://getformsmith.com/",
 
     contact: {
       email: "formsmithcustomforms@gmail.com",
@@ -54,29 +54,25 @@ window.FORMSMITH_DATA = {
 
     forms: {
       quote: {
-        mode: "development", // development | endpoint
-        provider: "none", // google-apps-script | formspree | emailjs | other
-        endpoint: "", // REPLACE_ME with the public form endpoint; never add a secret.
+        mode: "endpoint", // development | endpoint
+        provider: "formspree", // google-apps-script | formspree | emailjs | other
+        endpoint: "https://formspree.io/f/xqerelbq",
         method: "POST",
-        developmentMessage:
-          "Preview mode: your quote request was not sent. Quote submissions will be connected before the site is published.",
         successTitle: "Thank you for telling us about your project.",
         successMessage:
           "Your request was sent successfully. Formsmith Custom Forms will review the details and follow up using the contact information you provided."
       },
       contact: {
-        mode: "development", // development | endpoint
-        provider: "none",
-        endpoint: "", // REPLACE_ME with the public form endpoint; never add a secret.
+        mode: "endpoint", // development | endpoint
+        provider: "formspree",
+        endpoint: "https://formspree.io/f/xqerelbq",
         method: "POST",
-        developmentMessage:
-          "Preview mode: your message was not sent. Contact submissions will be connected before the site is published.",
         successTitle: "Message sent.",
         successMessage:
           "Thank you for contacting Formsmith Custom Forms. Your message was sent successfully."
       },
       privacy: {
-        policyVersion: "2026-07-14",
+        policyVersion: "2026-07-15",
         consentLabel:
           "I agree that Formsmith Custom Forms may use the information in this request to respond about my project.",
         policyPath: "privacy.html",
