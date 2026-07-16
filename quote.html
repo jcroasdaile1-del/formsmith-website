@@ -10,7 +10,7 @@
   <meta property="og:title" content="Request a Custom Software Quote | Formsmith Custom Forms">
   <meta property="og:description" content="Start with the process that is not working. Formsmith Custom Forms will help explore what a better custom system could look like.">
   <meta property="og:url" content="https://getformsmith.com/quote.html">
-  <meta name="theme-color" content="#173f4d">
+  <meta name="theme-color" content="#2b1b14">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/site.css">
 </head>
@@ -53,7 +53,7 @@
                 <div class="field"><label for="quote-email">Email <span aria-hidden="true">*</span></label><input id="quote-email" name="email" type="email" autocomplete="email" required maxlength="200"></div>
                 <div class="field"><label for="quote-phone">Phone <span class="optional">Optional</span></label><input id="quote-phone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
               </div>
-              <div class="field"><label for="business-website">Business website <span class="optional">Optional</span></label><input id="business-website" name="website" type="url" autocomplete="url" inputmode="url" placeholder="https://example.com"><small>If you have one, include the full web address.</small></div>
+              <div class="field"><label for="business-website">Business website <span class="optional">Optional</span></label><input id="business-website" name="website" type="text" autocomplete="url" inputmode="url" maxlength="300" placeholder="example.com"><small>You can enter a simple address such as example.com; https:// is not required.</small></div>
               <div class="field-grid field-grid--two">
                 <div class="field"><label for="business-type">Industry, organization type, or role <span aria-hidden="true">*</span></label><input id="business-type" name="businessType" type="text" required maxlength="120" placeholder="Example: equipment rental, teacher, or club"></div>
                 <div class="field"><label for="employee-count">Team size <span aria-hidden="true">*</span></label><select id="employee-count" name="employeeCount" data-select-options="employeeCounts" data-placeholder="Choose team size" required></select></div>
@@ -87,7 +87,7 @@
                 <div class="field"><label for="ideal-start">When would you ideally like to begin? <span aria-hidden="true">*</span></label><select id="ideal-start" name="idealStart" data-select-options="startTimeframes" data-placeholder="Choose a timeframe" required></select></div>
                 <div class="field"><label for="target-date">Is there a target completion date? <span class="optional">Optional</span></label><input id="target-date" name="targetCompletionDate" type="date"></div>
               </div>
-              <div class="field"><label for="budget-range">Approximate build budget <span class="optional">Optional</span></label><select id="budget-range" name="budgetRange" data-select-options="budgetRanges" data-placeholder="Choose a range or leave blank"></select><small>This estimate helps frame the options and scope; it does not determine the final quote.</small></div>
+              <div class="field"><label for="budget-range">Approximate build budget <span class="optional">Optional</span></label><select id="budget-range" name="budgetRange" data-select-options="budgetRanges" data-placeholder="Choose a range or leave blank"></select><small>There is no minimum project size. Smaller starting points and demos are welcome, and this estimate does not determine the final quote.</small></div>
               <div class="field"><label for="additional-notes">Is there anything else Formsmith should know? <span class="optional">Optional</span></label><textarea id="additional-notes" name="additionalNotes" rows="6" maxlength="3000" placeholder="Important deadlines, existing data, special terminology, workflow details, or questions…"></textarea></div>
               <div class="expectation-note"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><p>A requested date is helpful context, not a guaranteed delivery commitment. Schedule and scope are discussed before work begins.</p></div>
               <div class="form-actions"><button class="button button--ghost" type="button" data-previous-step>Back</button><button class="button" type="button" data-next-step>Review Your Request</button></div>

@@ -132,7 +132,7 @@ else {
     fail("assets/js/site-data.js", "business-data ownership FAQ must provide an explicit yes");
   }
   const budgetLabels = data.quoteOptions.budgetRanges.map((option) => option.label);
-  const expectedBudgets = ["I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
+  const expectedBudgets = ["I am not sure yet", "Under $500", "$500-$1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
   if (JSON.stringify(budgetLabels) !== JSON.stringify(expectedBudgets)) fail("assets/js/site-data.js", `unexpected budget ranges: ${budgetLabels.join(" | ")}`);
   if (budgetLabels.at(-1) !== "$5,000+") fail("assets/js/site-data.js", "budget ranges must end with $5,000+");
   const contact = data.site.contact;
@@ -199,6 +199,9 @@ if ((quote.match(/\bdata-form-step\b/g) || []).length !== 5) fail("quote.html", 
 if ((quote.match(/\bdata-progress-step\b/g) || []).length !== 5) fail("quote.html", "quote wizard must have exactly 5 progress steps");
 if (!/name="privacyAgreement"[^>]*required/.test(quote)) fail("quote.html", "privacy agreement is not required");
 if (!/class="quote-card"\s+id="quote-form"/.test(quote)) fail("quote.html", "quote form anchor is missing");
+if (!/id="business-website"[^>]*type="text"[^>]*placeholder="example\.com"/.test(quote) || !/https:\/\/ is not required/i.test(quote)) {
+  fail("quote.html", "business website field must accept a domain without requiring https://");
+}
 
 const contactPage = fs.readFileSync(path.join(root, "contact.html"), "utf8");
 if (/How should we address you\?|Where should we reply\?/i.test(contactPage)) fail("contact.html", "removed contact helper prompt is still present");

@@ -501,7 +501,7 @@ async function testQuoteWizard(browser, origin) {
   });
 
   const budgetOptions = await page.$$eval("#budget-range option", (items) => items.map((item) => ({ value: item.value, label: item.textContent.trim() })));
-  const expectedBudgets = ["Choose a range or leave blank", "I am not sure yet", "Under $1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
+  const expectedBudgets = ["Choose a range or leave blank", "I am not sure yet", "Under $500", "$500-$1,000", "$1,000-$2,499", "$2,500-$4,999", "$5,000+"];
   if (JSON.stringify(budgetOptions.map((item) => item.label)) !== JSON.stringify(expectedBudgets)) fail("quote wizard", `unexpected budget options: ${budgetOptions.map((item) => item.label).join(" | ")}`);
   if (budgetOptions.at(-1)?.label !== "$5,000+" || budgetOptions.at(-1)?.value !== "5000-plus") fail("quote wizard", "budget options do not end with an active $5,000+ choice");
 
@@ -511,6 +511,7 @@ async function testQuoteWizard(browser, origin) {
   await page.type("#business-name", "Audit Company");
   await page.type("#contact-name", "Test Person");
   await page.type("#quote-email", "test@example.com");
+  await page.type("#business-website", "example.com");
   await page.type("#business-type", "Equipment rental");
   await page.select("#employee-count", "just-me");
   await page.click('[data-form-step]:not([hidden]) [data-next-step]');
@@ -560,7 +561,7 @@ async function testQuoteWizard(browser, origin) {
     storage: localStorage.length
   }));
   if (finalState.successHidden || !finalState.formHidden || finalState.storage !== initialStorage) fail("quote wizard", `production submission state is incomplete (${JSON.stringify({ ...finalState, initialStorage })})`);
-  if (capturedMethod !== "POST" || capturedAccept !== "application/json" || !capturedContentType?.includes("application/x-www-form-urlencoded") || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
+  if (capturedMethod !== "POST" || capturedAccept !== "application/json" || !capturedContentType?.includes("application/x-www-form-urlencoded") || capturedPayload?.website !== "example.com" || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
     fail("quote wizard", `endpoint payload omitted method, response header, form encoding, or consent evidence (${JSON.stringify({ capturedMethod, capturedAccept, capturedContentType, capturedPayload })})`);
   }
   await page.close();
@@ -654,7 +655,14 @@ try {
 
   const screenshotPage = await browser.newPage();
   await screenshotPage.setViewport({ width: 1339, height: 871, deviceScaleFactor: 1 });
+  await screenshotPage.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "light" }]);
+  await screenshotPage.goto(`${origin}${mountPath}index.html`, { waitUntil: "load" });
+  const homeLightScreenshot = path.join(os.tmpdir(), "formsmith-home-light-1339.png");
+  await screenshotPage.screenshot({ path: homeLightScreenshot, fullPage: true });
   await screenshotPage.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
+  await screenshotPage.reload({ waitUntil: "load" });
+  const homeDarkScreenshot = path.join(os.tmpdir(), "formsmith-home-dark-1339.png");
+  await screenshotPage.screenshot({ path: homeDarkScreenshot, fullPage: true });
   await screenshotPage.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
   const screenshot = path.join(os.tmpdir(), "formsmith-contact-dark-1339.png");
   await screenshotPage.screenshot({ path: screenshot, fullPage: true });
@@ -663,6 +671,7 @@ try {
   if (failures.length) {
     console.error(`Browser audit failed with ${failures.length} issue${failures.length === 1 ? "" : "s"}:`);
     failures.forEach((issue) => console.error(`- ${issue}`));
+    console.error(`Home screenshots: ${homeLightScreenshot} / ${homeDarkScreenshot}`);
     console.error(`Contact screenshot: ${screenshot}`);
     process.exitCode = 1;
   } else {
@@ -670,6 +679,7 @@ try {
     console.log(`Demo smoke tests passed ${demoPages.length} applications across ${demoViewports.length} responsive viewports.`);
     console.log("Interactions passed: navigation, breakpoint/theme regressions, portfolio filters, FAQ ownership, contact form, quote wizard, form anchors, no-JavaScript fallback, and GitHub Pages subpath.");
     console.log(`Contact layout samples: ${contactSnapshots.map((item) => `${item.colorScheme}/${item.viewport}=${Math.round(item.headingWidth)}px`).join(", ")}`);
+    console.log(`Home screenshots: ${homeLightScreenshot} / ${homeDarkScreenshot}`);
     console.log(`Contact screenshot: ${screenshot}`);
   }
 } finally {

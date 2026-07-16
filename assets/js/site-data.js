@@ -768,7 +768,7 @@ window.FORMSMITH_DATA = {
     {
       question: "How much does a project cost?",
       answer:
-        "Each project is quoted individually based on the workflow, screens, data, automation, reporting, mobile use, revisions, and support involved. If a larger idea needs to be divided into focused phases, that will be discussed before work begins. Any third-party service or optional ongoing-support costs will be identified separately. The initial quote request is free."
+        "There is no minimum project price. Smaller starting points and focused demos are welcome, and each project is quoted individually based on the workflow, screens, data, automation, reporting, mobile use, revisions, and support involved. If a larger idea needs to be divided into focused phases, that will be discussed before work begins. Any third-party service or optional ongoing-support costs will be identified separately. The initial quote request is free."
     },
     {
       question: "How long does a project take?",
@@ -870,7 +870,8 @@ window.FORMSMITH_DATA = {
     ],
     budgetRanges: [
       { value: "not-sure", label: "I am not sure yet" },
-      { value: "under-1000", label: "Under $1,000" },
+      { value: "under-500", label: "Under $500" },
+      { value: "500-1000", label: "$500-$1,000" },
       { value: "1000-2499", label: "$1,000-$2,499" },
       { value: "2500-4999", label: "$2,500-$4,999" },
       { value: "5000-plus", label: "$5,000+" }
