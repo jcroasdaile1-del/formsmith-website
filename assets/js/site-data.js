@@ -385,11 +385,17 @@ window.FORMSMITH_DATA = {
         notice: "Uses fictional travelers, trips, quotes, and documents."
       },
       detailPath: "projects/travel-agency-manager.html",
-      screenshots: [],
-      screenshotPlaceholder: {
-        title: "Travel Agency Manager interface preview",
-        description: "A polished preview image can be added after final branding is selected."
-      },
+      screenshots: [
+        {
+          src: "portfolio-assets/travel-agency-dashboard.png",
+          alt: "Travel agency sample dashboard with leads, quotes, trips, payment alerts, and upcoming client reservations",
+          caption: "Agency dashboard for trips, quotes, payments, and follow-up",
+          width: 1600,
+          height: 788,
+          placeholder: false
+        }
+      ],
+      screenshotPlaceholder: null,
       technology: ["Interactive browser demo"]
     },
     {
@@ -493,11 +499,17 @@ window.FORMSMITH_DATA = {
         notice: "Uses fictional students and sample classroom information."
       },
       detailPath: "projects/teacher-tracker.html",
-      screenshots: [],
-      screenshotPlaceholder: {
-        title: "Teacher Tracker interface preview",
-        description: "A polished preview image can be added after final branding is selected."
-      },
+      screenshots: [
+        {
+          src: "portfolio-assets/teacher-tracker-dashboard.png",
+          alt: "Teacher Tracker sample dashboard with class statistics, grade distribution, and grade trend charts",
+          caption: "Classroom statistics and performance dashboard",
+          width: 1600,
+          height: 788,
+          placeholder: false
+        }
+      ],
+      screenshotPlaceholder: null,
       technology: ["Interactive browser demo"]
     },
     {
@@ -539,11 +551,17 @@ window.FORMSMITH_DATA = {
         notice: "Uses sample equipment, costs, sales, and financial information."
       },
       detailPath: "projects/equipment-inventory-profit-tracker.html",
-      screenshots: [],
-      screenshotPlaceholder: {
-        title: "Equipment Inventory and Profit Tracker interface preview",
-        description: "A polished preview image can be added after final branding is selected."
-      },
+      screenshots: [
+        {
+          src: "portfolio-assets/equipment-inventory-dashboard.png",
+          alt: "Equipment inventory sample dashboard with inventory filters, equipment listings, and sales navigation",
+          caption: "Searchable equipment inventory and sales workspace",
+          width: 1600,
+          height: 788,
+          placeholder: false
+        }
+      ],
+      screenshotPlaceholder: null,
       technology: ["Interactive browser demo"]
     }
   ],

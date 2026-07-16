@@ -140,6 +140,9 @@ else {
     fail("assets/js/site-data.js", "configured email, phone, Facebook, Etsy, or placeholder status is incorrect");
   }
   for (const project of data.projects) {
+    if (project.status === "Live Demo" && !(project.screenshots || []).some((screenshot) => screenshot.src)) {
+      fail("assets/js/site-data.js", `${project.slug} is a live demo without a real screenshot`);
+    }
     for (const [label, target] of [["detail", project.detailPath], ["demo", project.demo?.url]]) {
       if (target && !localTargetExists("index.html", target)) fail("assets/js/site-data.js", `${project.slug} has broken ${label} path: ${target}`);
     }
