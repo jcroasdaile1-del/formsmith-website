@@ -75,7 +75,7 @@ window.FORMSMITH_DATA = {
         policyVersion: "2026-07-15",
         consentLabel:
           "I agree that Formsmith Custom Forms may use the information in this request to respond about my project.",
-        policyPath: "privacy.html",
+        policyPath: "privacy/",
         storageNotice:
           "Form entries remain in the page only while you complete the form and are not saved to local storage."
       }
@@ -83,16 +83,16 @@ window.FORMSMITH_DATA = {
   },
 
   navigation: [
-    { label: "Home", path: "index.html", page: "home" },
-    { label: "Demos", path: "demos.html", page: "demos" },
-    { label: "Industries", path: "industries.html", page: "industries" },
-    { label: "Pricing", path: "pricing.html", page: "pricing" },
-    { label: "About", path: "about.html", page: "about" },
-    { label: "FAQ", path: "faq.html", page: "faq" },
-    { label: "Contact", path: "contact.html#contact-form", page: "contact" },
+    { label: "Home", path: "", page: "home" },
+    { label: "Demos", path: "demos/", page: "demos" },
+    { label: "Industries", path: "industries/", page: "industries" },
+    { label: "Pricing", path: "pricing/", page: "pricing" },
+    { label: "About", path: "about/", page: "about" },
+    { label: "FAQ", path: "faq/", page: "faq" },
+    { label: "Contact", path: "contact/#contact-form", page: "contact" },
     {
       label: "Request a Quote",
-      path: "quote.html#quote-form",
+      path: "quote/#quote-form",
       page: "quote",
       isPrimaryCta: true
     }

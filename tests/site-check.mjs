@@ -10,17 +10,10 @@ const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(dataSource, context, { filename: "site-data.js" });
 const data = context.window.FORMSMITH_DATA;
+const marketingPageNames = ["demos", "portfolio", "industries", "pricing", "about", "faq", "contact", "quote", "privacy"];
 const pages = [
   "index.html",
-  "demos.html",
-  "portfolio.html",
-  "industries.html",
-  "pricing.html",
-  "about.html",
-  "faq.html",
-  "contact.html",
-  "quote.html",
-  "privacy.html",
+  ...marketingPageNames.map((name) => `${name}/index.html`),
   "404.html",
   ...(data?.projects || []).map((project) => project.detailPath)
 ];
@@ -164,6 +157,20 @@ else {
   }
 }
 
+for (const name of marketingPageNames) {
+  const legacyPage = `${name}.html`;
+  const legacyPath = path.join(root, legacyPage);
+  if (!fs.existsSync(legacyPath)) {
+    fail(legacyPage, "missing legacy redirect stub");
+    continue;
+  }
+  const html = fs.readFileSync(legacyPath, "utf8");
+  const cleanUrl = `https://getformsmith.com/${name}/`;
+  if (!/<meta\s+name="robots"\s+content="[^"]*noindex/i.test(html)) fail(legacyPage, "redirect stub must use noindex");
+  if (!html.includes(`<link rel="canonical" href="${cleanUrl}">`)) fail(legacyPage, "redirect stub canonical is incorrect");
+  if (!/<meta\s+http-equiv="refresh"\s+content="0;\s*url=\.\/[a-z-]+\/"/i.test(html)) fail(legacyPage, "redirect stub is missing its clean-URL refresh");
+}
+
 if (productionMode && data) {
   const contact = data.site.contact;
   if (!data.site.customDomain || data.site.canonicalBaseUrl !== data.site.customDomain) {
@@ -187,30 +194,30 @@ if (productionMode && data) {
   if (/REPLACE[_-]?ME|hello@REPLACE-ME|\(000\) 000-0000/i.test(dataSource)) {
     fail("assets/js/site-data.js", "production mode still contains contact placeholders");
   }
-  const contactPage = fs.readFileSync(path.join(root, "contact.html"), "utf8");
+  const contactPage = fs.readFileSync(path.join(root, "contact/index.html"), "utf8");
   if (/once the final contact details .* configured|awaiting configuration/i.test(contactPage)) {
-    fail("contact.html", "production mode still contains preview-only contact wording");
+    fail("contact/index.html", "production mode still contains preview-only contact wording");
   }
-  const privacyPage = fs.readFileSync(path.join(root, "privacy.html"), "utf8");
+  const privacyPage = fs.readFileSync(path.join(root, "privacy/index.html"), "utf8");
   if (/forms are not connected|may later connect|will be documented when|will be added before|awaiting configuration/i.test(privacyPage)) {
-    fail("privacy.html", "production mode requires the final provider, retention, and privacy-contact wording");
+    fail("privacy/index.html", "production mode requires the final provider, retention, and privacy-contact wording");
   }
 }
 
-const quote = fs.readFileSync(path.join(root, "quote.html"), "utf8");
-if ((quote.match(/\bdata-form-step\b/g) || []).length !== 5) fail("quote.html", "quote wizard must have exactly 5 form steps");
-if ((quote.match(/\bdata-progress-step\b/g) || []).length !== 5) fail("quote.html", "quote wizard must have exactly 5 progress steps");
-if (!/name="privacyAgreement"[^>]*required/.test(quote)) fail("quote.html", "privacy agreement is not required");
-if (!/class="quote-card"\s+id="quote-form"/.test(quote)) fail("quote.html", "quote form anchor is missing");
+const quote = fs.readFileSync(path.join(root, "quote/index.html"), "utf8");
+if ((quote.match(/\bdata-form-step\b/g) || []).length !== 5) fail("quote/index.html", "quote wizard must have exactly 5 form steps");
+if ((quote.match(/\bdata-progress-step\b/g) || []).length !== 5) fail("quote/index.html", "quote wizard must have exactly 5 progress steps");
+if (!/name="privacyAgreement"[^>]*required/.test(quote)) fail("quote/index.html", "privacy agreement is not required");
+if (!/class="quote-card"\s+id="quote-form"/.test(quote)) fail("quote/index.html", "quote form anchor is missing");
 if (!/id="business-website"[^>]*type="text"[^>]*placeholder="example\.com"/.test(quote) || !/https:\/\/ is not required/i.test(quote)) {
-  fail("quote.html", "business website field must accept a domain without requiring https://");
+  fail("quote/index.html", "business website field must accept a domain without requiring https://");
 }
 
-const contactPage = fs.readFileSync(path.join(root, "contact.html"), "utf8");
-if (/How should we address you\?|Where should we reply\?/i.test(contactPage)) fail("contact.html", "removed contact helper prompt is still present");
-if (!/class="form-card"\s+id="contact-form"/.test(contactPage)) fail("contact.html", "contact form anchor is missing");
+const contactPage = fs.readFileSync(path.join(root, "contact/index.html"), "utf8");
+if (/How should we address you\?|Where should we reply\?/i.test(contactPage)) fail("contact/index.html", "removed contact helper prompt is still present");
+if (!/class="form-card"\s+id="contact-form"/.test(contactPage)) fail("contact/index.html", "contact form anchor is missing");
 
-const marketingCopy = ["index.html", "demos.html", "pricing.html", "faq.html", "privacy.html", "quote.html"].map((page) => fs.readFileSync(path.join(root, page), "utf8")).join("\n");
+const marketingCopy = ["index.html", "demos/index.html", "pricing/index.html", "faq/index.html", "privacy/index.html", "quote/index.html"].map((page) => fs.readFileSync(path.join(root, page), "utf8")).join("\n");
 if (/\bhost(?:ing|ed|s)?\b/i.test(`${marketingCopy}\n${dataSource}`)) fail("marketing copy", "still refers to hosting");
 
 if (errors.length) {
