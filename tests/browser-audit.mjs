@@ -15,15 +15,15 @@ vm.runInContext(fs.readFileSync(path.join(root, "assets/js/site-data.js"), "utf8
 const projectData = dataContext.window.FORMSMITH_DATA.projects;
 const pages = [
   "index.html",
-  "demos.html",
-  "portfolio.html",
-  "industries.html",
-  "pricing.html",
-  "about.html",
-  "faq.html",
-  "contact.html",
-  "quote.html",
-  "privacy.html",
+  "demos/",
+  "portfolio/",
+  "industries/",
+  "pricing/",
+  "about/",
+  "faq/",
+  "contact/",
+  "quote/",
+  "privacy/",
   "404.html",
   ...projectData.map((project) => project.detailPath)
 ];
@@ -218,7 +218,7 @@ async function scanLayouts(browser, origin) {
         if (!response || (response.status() >= 400 && pagePath !== "404.html")) fail(scope, `HTTP status ${response?.status() || "missing"}`);
         await settlePage(page);
         const result = await inspectPage(page, scope, viewport);
-        if (pagePath === "contact.html") contactSnapshots.push({ colorScheme, viewport: viewport.name, ...result.contact });
+        if (pagePath === "contact/") contactSnapshots.push({ colorScheme, viewport: viewport.name, ...result.contact });
         runtimeIssues.splice(0).forEach((issue) => fail(scope, issue));
       }
       await page.close();
@@ -316,7 +316,7 @@ async function testMobileNavigation(browser, origin) {
 async function testBreakpointAndThemeRegressions(browser, origin) {
   const page = await browser.newPage();
   await page.setViewport({ width: 820, height: 1180 });
-  await page.goto(`${origin}${mountPath}faq.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}faq/`, { waitUntil: "load" });
   const tabletPosition = await page.$eval(".faq-intro-card", (element) => getComputedStyle(element).position);
   if (tabletPosition === "sticky") fail("FAQ breakpoint", "single-column FAQ intro remains sticky at 820px");
   await page.setViewport({ width: 1024, height: 768 });
@@ -324,7 +324,7 @@ async function testBreakpointAndThemeRegressions(browser, origin) {
   if (desktopPosition !== "sticky") fail("FAQ breakpoint", "two-column FAQ intro is not sticky at desktop width");
 
   await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
-  await page.goto(`${origin}${mountPath}pricing.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}pricing/`, { waitUntil: "load" });
   const primary = ".page-hero .button:not(.button--ghost)";
   const ghost = ".page-hero .button--ghost";
   await page.hover(primary);
@@ -354,15 +354,41 @@ async function testCustomDomain404(browser, origin) {
     home: document.querySelector(".not-found a")?.getAttribute("href"),
     overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
   }));
-  if (response?.status() !== 404 || state.h1 !== "We could not find that page." || !state.header || !state.styled || state.home !== "/index.html" || state.overflow) {
+  if (response?.status() !== 404 || state.h1 !== "We could not find that page." || !state.header || !state.styled || state.home !== "/" || state.overflow) {
     fail("custom-domain 404", `root assets or links failed (${JSON.stringify({ status: response?.status(), ...state })})`);
+  }
+  await page.close();
+}
+
+async function testCleanMarketingUrls(browser, origin) {
+  const names = ["demos", "portfolio", "industries", "pricing", "about", "faq", "contact", "quote", "privacy"];
+  const page = await browser.newPage();
+  await page.goto(`${origin}${mountPath}index.html`, { waitUntil: "load" });
+  const legacyLinks = await page.$$eval("a[href]", (links, pageNames) => links
+    .map((link) => link.getAttribute("href"))
+    .filter((href) => pageNames.some((name) => new RegExp(`(?:^|/)${name}\\.html(?:$|[?#])`).test(href))), names);
+  if (legacyLinks.length) fail("clean marketing URLs", `homepage still renders legacy links: ${legacyLinks.join(", ")}`);
+
+  for (const name of names) {
+    const cleanResponse = await page.goto(`${origin}${mountPath}${name}/`, { waitUntil: "load" });
+    const cleanState = await page.evaluate(() => ({ pathname: location.pathname, canonical: document.querySelector('link[rel="canonical"]')?.href || "" }));
+    if (cleanResponse?.status() !== 200 || !cleanState.pathname.endsWith(`/${name}/`) || !cleanState.canonical.endsWith(`/${name}/`)) {
+      fail("clean marketing URLs", `${name}/ did not resolve cleanly (${JSON.stringify({ status: cleanResponse?.status(), ...cleanState })})`);
+    }
+
+    await page.goto(`${origin}${mountPath}${name}.html?legacy=1#preserved`, { waitUntil: "load" });
+    await page.waitForFunction((expected) => location.pathname.endsWith(expected), { timeout: 3000 }, `/${name}/`);
+    const redirectState = await page.evaluate(() => ({ pathname: location.pathname, search: location.search, hash: location.hash }));
+    if (redirectState.search !== "?legacy=1" || redirectState.hash !== "#preserved") {
+      fail("legacy marketing redirects", `${name}.html did not preserve query/hash (${JSON.stringify(redirectState)})`);
+    }
   }
   await page.close();
 }
 
 async function testPortfolioFilters(browser, origin) {
   const page = await browser.newPage();
-  await page.goto(`${origin}${mountPath}portfolio.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}portfolio/`, { waitUntil: "load" });
   const expected = await page.$$eval(".project-card", (cards) => ({
     all: cards.length,
     "live-demo": cards.filter((card) => card.dataset.projectStatus === "live-demo").length,
@@ -402,7 +428,7 @@ async function testDemoOrderingAndPreload(browser, origin) {
     fail("critical script delivery", `homepage project renderer is not preloaded and cache-versioned (${JSON.stringify(delivery)})`);
   }
 
-  await page.goto(`${origin}${mountPath}demos.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}demos/`, { waitUntil: "load" });
   const demos = await page.$$eval('[data-project-grid="demos"] .project-card h3', (headings) => headings.map((heading) => heading.textContent.trim()));
   if (demos[1] !== "Photography Studio Manager") {
     fail("demos page order", `photography app should be second, found ${JSON.stringify(demos.slice(0, 3))}`);
@@ -412,7 +438,7 @@ async function testDemoOrderingAndPreload(browser, origin) {
 
 async function testFaqOwnership(browser, origin) {
   const page = await browser.newPage();
-  await page.goto(`${origin}${mountPath}faq.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}faq/`, { waitUntil: "load" });
   const result = await page.evaluate(() => {
     const items = [...document.querySelectorAll(".faq-item")];
     const ownership = items.find((item) => item.querySelector("summary")?.textContent.includes("own my business data"));
@@ -426,7 +452,7 @@ async function testFaqOwnership(browser, origin) {
 
 async function testContactForm(browser, origin) {
   const page = await browser.newPage();
-  await page.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}contact/`, { waitUntil: "load" });
   const contactConfig = await page.evaluate(() => ({
     mode: window.FORMSMITH_DATA.site.forms.contact.mode,
     provider: window.FORMSMITH_DATA.site.forms.contact.provider,
@@ -499,7 +525,7 @@ async function testContactForm(browser, origin) {
 
 async function testQuoteWizard(browser, origin) {
   const page = await browser.newPage();
-  await page.goto(`${origin}${mountPath}quote.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}quote/`, { waitUntil: "load" });
   const initialStorage = await page.evaluate(() => localStorage.length);
   const quoteConfig = await page.evaluate(() => ({
     mode: window.FORMSMITH_DATA.site.forms.quote.mode,
@@ -621,7 +647,7 @@ async function testFormAnchors(browser, origin) {
     fail("quote form anchor", `CTA did not align the form below the sticky header (${JSON.stringify(quoteState)})`);
   }
 
-  await page.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}contact/`, { waitUntil: "load" });
   await page.click('a[href="#contact-form"]');
   await page.waitForFunction(() => location.hash === "#contact-form");
   await new Promise((resolve) => setTimeout(resolve, 450));
@@ -639,14 +665,14 @@ async function testFormAnchors(browser, origin) {
 async function testNoScriptAndPrefix(browser, origin) {
   const page = await browser.newPage();
   await page.setJavaScriptEnabled(false);
-  for (const pagePath of ["index.html", "contact.html", "quote.html", "projects/equipment-rental-manager.html"]) {
+  for (const pagePath of ["index.html", "contact/", "quote/", "projects/equipment-rental-manager.html"]) {
     const response = await page.goto(`${origin}${mountPath}${pagePath}`, { waitUntil: "load" });
     if (!response || response.status() !== 200) fail("GitHub Pages prefix", `${pagePath} returned ${response?.status() || "no response"}`);
   }
   await page.goto(`${origin}${mountPath}projects/equipment-rental-manager.html`, { waitUntil: "load" });
   const projectFallback = await page.$eval("main", (element) => /Equipment Rental Manager/.test(element.textContent) && Boolean(element.querySelector("h1")));
   if (!projectFallback) fail("no-JavaScript", "project detail fallback is missing its static title and summary");
-  await page.goto(`${origin}${mountPath}quote.html`, { waitUntil: "load" });
+  await page.goto(`${origin}${mountPath}quote/`, { waitUntil: "load" });
   const quoteNoScript = await page.$eval(".noscript", (element) => getComputedStyle(element).display !== "none" && /requires JavaScript/i.test(element.textContent));
   const formHidden = await page.$eval("[data-quote-wizard]", (element) => getComputedStyle(element).display === "none");
   if (!quoteNoScript || !formHidden) fail("no-JavaScript", "quote fallback is not visible or the unusable form remains shown");
@@ -676,6 +702,8 @@ try {
   await testBreakpointAndThemeRegressions(browser, origin);
   console.log("Running custom-domain 404 check…");
   await testCustomDomain404(browser, origin);
+  console.log("Running clean marketing URL and legacy redirect checks…");
+  await testCleanMarketingUrls(browser, origin);
   console.log("Running homepage and demos ordering and preload checks…");
   await testDemoOrderingAndPreload(browser, origin);
   console.log("Running portfolio filter interaction…");
@@ -701,7 +729,7 @@ try {
   await screenshotPage.reload({ waitUntil: "load" });
   const homeDarkScreenshot = path.join(os.tmpdir(), "formsmith-home-dark-1339.png");
   await screenshotPage.screenshot({ path: homeDarkScreenshot, fullPage: true });
-  await screenshotPage.goto(`${origin}${mountPath}contact.html`, { waitUntil: "load" });
+  await screenshotPage.goto(`${origin}${mountPath}contact/`, { waitUntil: "load" });
   const screenshot = path.join(os.tmpdir(), "formsmith-contact-dark-1339.png");
   await screenshotPage.screenshot({ path: screenshot, fullPage: true });
   await screenshotPage.close();

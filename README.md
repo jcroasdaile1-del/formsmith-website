@@ -9,15 +9,15 @@ The marketing site is the repository root. The active demos are included here at
 ```text
 formsmith-website/
 ├── index.html                  # Home
-├── demos.html                  # Interactive demos
-├── portfolio.html              # All projects and statuses
-├── industries.html             # Industry-specific examples
-├── pricing.html                # Custom pricing approach
-├── about.html                  # Brand and company positioning
-├── faq.html                    # Frequently asked questions
-├── contact.html                # General inquiry form
-├── quote.html                  # Five-step quote request wizard
-├── privacy.html                # Current website and form privacy notice
+├── demos/index.html            # Interactive demos at /demos/
+├── portfolio/index.html        # All projects and statuses at /portfolio/
+├── industries/index.html       # Industry-specific examples at /industries/
+├── pricing/index.html          # Custom pricing approach at /pricing/
+├── about/index.html            # Brand and company positioning at /about/
+├── faq/index.html              # Frequently asked questions at /faq/
+├── contact/index.html          # General inquiry form at /contact/
+├── quote/index.html            # Five-step quote request wizard at /quote/
+├── privacy/index.html          # Current website and form privacy notice at /privacy/
 ├── 404.html                    # GitHub Pages not-found page
 ├── projects/                   # Reusable project-detail shells
 ├── assets/
@@ -171,7 +171,7 @@ To change to Google Apps Script or another service:
 4. Set `mode` to `"endpoint"`.
 5. If the service requires a different payload or headers, edit only the submission block in `assets/js/quote-wizard.js` or `assets/js/site.js`.
 6. Submit test data and confirm the real success state appears only after the service returns a successful HTTP response.
-7. Update `privacy.html` with the provider, retention practice, and final privacy contact.
+7. Update `privacy/index.html` with the provider, retention practice, and final privacy contact.
 8. Enforce validation, request-size limits, allowed origins/CORS, and spam or rate controls at the endpoint. Browser validation is not a security boundary.
 
 Never put a secret API key, private token, or service-account credential in this repository. GitHub Pages JavaScript is public.

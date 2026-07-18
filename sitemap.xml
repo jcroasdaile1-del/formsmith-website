@@ -2,15 +2,15 @@
 <!-- Update these URLs if a custom domain is connected. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://getformsmith.com/</loc></url>
-  <url><loc>https://getformsmith.com/demos.html</loc></url>
-  <url><loc>https://getformsmith.com/portfolio.html</loc></url>
-  <url><loc>https://getformsmith.com/industries.html</loc></url>
-  <url><loc>https://getformsmith.com/pricing.html</loc></url>
-  <url><loc>https://getformsmith.com/about.html</loc></url>
-  <url><loc>https://getformsmith.com/faq.html</loc></url>
-  <url><loc>https://getformsmith.com/contact.html</loc></url>
-  <url><loc>https://getformsmith.com/quote.html</loc></url>
-  <url><loc>https://getformsmith.com/privacy.html</loc></url>
+  <url><loc>https://getformsmith.com/demos/</loc></url>
+  <url><loc>https://getformsmith.com/portfolio/</loc></url>
+  <url><loc>https://getformsmith.com/industries/</loc></url>
+  <url><loc>https://getformsmith.com/pricing/</loc></url>
+  <url><loc>https://getformsmith.com/about/</loc></url>
+  <url><loc>https://getformsmith.com/faq/</loc></url>
+  <url><loc>https://getformsmith.com/contact/</loc></url>
+  <url><loc>https://getformsmith.com/quote/</loc></url>
+  <url><loc>https://getformsmith.com/privacy/</loc></url>
   <url><loc>https://getformsmith.com/projects/equipment-rental-manager.html</loc></url>
   <url><loc>https://getformsmith.com/projects/photography-studio-manager.html</loc></url>
   <url><loc>https://getformsmith.com/projects/powerwash-pro.html</loc></url>

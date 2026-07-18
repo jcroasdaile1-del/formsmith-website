@@ -32,8 +32,9 @@
   const currentPage = body.dataset.page || "";
 
   function resolvePath(path) {
-    if (!path || /^(?:[a-z]+:|#)/i.test(path)) return path || "";
+    if (path == null || /^(?:[a-z]+:|#)/i.test(path)) return path || "";
     const normalizedBase = base === "/" ? "" : base.replace(/\/+$/, "");
+    if (path === "") return `${normalizedBase}/` || "/";
     return `${normalizedBase}/${path}`.replace(/\/\.\//g, "/");
   }
 
@@ -88,7 +89,7 @@
     mount.innerHTML = `
       <header class="site-header">
         <div class="header-inner shell">
-          <a class="brand" href="${resolvePath("index.html")}" aria-label="${escapeHtml(data.site.name)} home">
+          <a class="brand" href="${resolvePath("")}" aria-label="${escapeHtml(data.site.name)} home">
             ${brandMark()}
             <span class="brand-copy"><strong>${escapeHtml(data.site.name)}</strong><small>Forged to order.</small></span>
           </a>
@@ -97,7 +98,7 @@
           </button>
           <nav class="primary-nav" id="primary-navigation" aria-label="Primary navigation">
             <div class="nav-links">${links}</div>
-            <a class="button button--small nav-cta" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a>
+            <a class="button button--small nav-cta" href="${resolvePath("quote/#quote-form")}">Request a Quote ${icon("arrow")}</a>
           </nav>
         </div>
       </header>`;
@@ -158,21 +159,21 @@
       <footer class="site-footer">
         <div class="shell footer-grid">
           <div class="footer-brand">
-            <a class="brand brand--footer" href="${resolvePath("index.html")}">${brandMark()}<span class="brand-copy"><strong>${escapeHtml(data.site.name)}</strong><small>Forged to order.</small></span></a>
+            <a class="brand brand--footer" href="${resolvePath("")}">${brandMark()}<span class="brand-copy"><strong>${escapeHtml(data.site.name)}</strong><small>Forged to order.</small></span></a>
             <p>Practical custom business software shaped around the way your small business already works.</p>
           </div>
           <div>
             <h2 class="footer-heading">Explore</h2>
-            <ul class="footer-links"><li><a href="${resolvePath("demos.html")}">Live demos</a></li><li><a href="${resolvePath("portfolio.html")}">All projects</a></li><li><a href="${resolvePath("industries.html")}">Industries</a></li><li><a href="${resolvePath("pricing.html")}">Pricing approach</a></li></ul>
+            <ul class="footer-links"><li><a href="${resolvePath("demos/")}">Live demos</a></li><li><a href="${resolvePath("portfolio/")}">All projects</a></li><li><a href="${resolvePath("industries/")}">Industries</a></li><li><a href="${resolvePath("pricing/")}">Pricing approach</a></li></ul>
           </div>
           <div>
             <h2 class="footer-heading">Company</h2>
-            <ul class="footer-links"><li><a href="${resolvePath("about.html")}">About Formsmith Custom Forms</a></li><li><a href="${resolvePath("faq.html")}">Frequently asked questions</a></li><li><a href="${resolvePath("contact.html#contact-form")}">Contact</a></li><li><a href="${resolvePath("privacy.html")}">Privacy</a></li></ul>
+            <ul class="footer-links"><li><a href="${resolvePath("about/")}">About Formsmith Custom Forms</a></li><li><a href="${resolvePath("faq/")}">Frequently asked questions</a></li><li><a href="${resolvePath("contact/#contact-form")}">Contact</a></li><li><a href="${resolvePath("privacy/")}">Privacy</a></li></ul>
           </div>
           <div>
             <h2 class="footer-heading">Start a conversation</h2>
             <p class="footer-contact">Tell us what is slowing the business down. The initial quote request is free.</p>
-            <a class="text-link" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a>
+            <a class="text-link" href="${resolvePath("quote/#quote-form")}">Request a Quote ${icon("arrow")}</a>
             ${contactLine}
           </div>
         </div>
@@ -280,13 +281,13 @@
     document.querySelectorAll("[data-industry-grid]").forEach((mount) => {
       const limit = Number(mount.dataset.limit || 0);
       const items = limit ? data.industries.slice(0, limit) : data.industries;
-      mount.innerHTML = items.map((industry, index) => `<a class="industry-card reveal" style="--reveal-delay:${Math.min(index % 4, 3) * 60}ms" href="${resolvePath(`industries.html#${industry.slug}`)}"><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h3>${escapeHtml(industry.name)}</h3><p>${escapeHtml(industry.summary)}</p><span class="card-link">See examples ${icon("arrow")}</span></a>`).join("");
+      mount.innerHTML = items.map((industry, index) => `<a class="industry-card reveal" style="--reveal-delay:${Math.min(index % 4, 3) * 60}ms" href="${resolvePath(`industries/#${industry.slug}`)}"><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h3>${escapeHtml(industry.name)}</h3><p>${escapeHtml(industry.summary)}</p><span class="card-link">See examples ${icon("arrow")}</span></a>`).join("");
     });
 
     const detailMount = document.querySelector("[data-industry-details]");
     if (detailMount) {
       detailMount.innerHTML = data.industries.map((industry, index) => `<article class="industry-detail reveal" id="${escapeHtml(industry.slug)}">
-        <div class="industry-detail__intro"><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h2>${escapeHtml(industry.name)}</h2><p>${escapeHtml(industry.longDescription || industry.summary)}</p><a class="text-link" href="${resolvePath("quote.html#quote-form")}">Discuss your workflow ${icon("arrow")}</a></div>
+        <div class="industry-detail__intro"><span class="industry-card__icon">${icon(industry.icon || "gear")}</span><h2>${escapeHtml(industry.name)}</h2><p>${escapeHtml(industry.longDescription || industry.summary)}</p><a class="text-link" href="${resolvePath("quote/#quote-form")}">Discuss your workflow ${icon("arrow")}</a></div>
         <div class="industry-detail__examples"><h3>What Formsmith might build</h3><ul class="check-grid">${industry.examples.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}</ul></div>
       </article>`).join("");
     }
@@ -316,13 +317,13 @@
       <section class="project-hero section section--first">
         <div class="shell project-hero__grid">
           <div class="project-hero__copy">
-            <a class="back-link" href="${resolvePath("portfolio.html")}">${icon("arrow")} All projects</a>
+            <a class="back-link" href="${resolvePath("portfolio/")}">${icon("arrow")} All projects</a>
             <div class="eyebrow">${escapeHtml(project.industry)}</div>
             <div class="project-status-row"><span class="status status--${statusClass(project.status)}">${escapeHtml(project.status)}</span><span class="status status--${statusClass(project.classification)}">${escapeHtml(project.classification)}</span></div>
             <h1>${escapeHtml(project.title)}</h1>
             <p class="lede">${escapeHtml(project.summary)}</p>
             ${project.demo?.notice ? `<div class="demo-notice"><strong>Demo note:</strong> ${escapeHtml(project.demo.notice)} Please do not enter real or sensitive information.</div>` : ""}
-            <div class="button-row">${demoAction(project)}<a class="button button--ghost" href="${resolvePath("quote.html#quote-form")}">Request Something Similar ${icon("arrow")}</a></div>
+            <div class="button-row">${demoAction(project)}<a class="button button--ghost" href="${resolvePath("quote/#quote-form")}">Request Something Similar ${icon("arrow")}</a></div>
           </div>
           ${projectVisual(project, true)}
         </div>
@@ -335,7 +336,7 @@
       </div></section>
       <section class="section section--tint"><div class="shell split-heading"><div><div class="eyebrow">Built for the work</div><h2>Key capabilities</h2></div><p>Every feature is included because it supports the workflow—not because it fills a generic software checklist.</p></div><div class="shell feature-grid">${project.features.map((feature) => `<div class="feature-tile"><span class="feature-tile__icon">${icon("check")}</span><h3>${escapeHtml(feature)}</h3></div>`).join("")}</div></section>
       <section class="section"><div class="shell"><div class="split-heading"><div><div class="eyebrow">Interface preview</div><h2>See the system in context</h2></div><p>${screenshots.length ? "Real interface screens from the current build or demonstration." : "A layout preview until final project imagery is ready."}</p></div><div class="screenshot-grid">${screenshots.length ? screenshots.map((shot) => `<figure><img src="${resolvePath(shot.src)}" alt="${escapeHtml(shot.alt)}" width="${shot.width || 1920}" height="${shot.height || 946}" loading="lazy" decoding="async"><figcaption>${escapeHtml(shot.caption || project.title)}</figcaption></figure>`).join("") : projectVisual(project)}</div></div></section>
-      <section class="section section--cta"><div class="shell cta-panel"><div><div class="eyebrow eyebrow--light">Have a similar bottleneck?</div><h2>Your workflow deserves its own system.</h2><p>Tell Formsmith what you are managing today and what needs to work better.</p></div><a class="button button--light" href="${resolvePath("quote.html#quote-form")}">Request a Quote ${icon("arrow")}</a></div></section>`;
+      <section class="section section--cta"><div class="shell cta-panel"><div><div class="eyebrow eyebrow--light">Have a similar bottleneck?</div><h2>Your workflow deserves its own system.</h2><p>Tell Formsmith what you are managing today and what needs to work better.</p></div><a class="button button--light" href="${resolvePath("quote/#quote-form")}">Request a Quote ${icon("arrow")}</a></div></section>`;
   }
 
   function renderContactDetails() {
@@ -383,7 +384,7 @@
         const privacy = data.site.forms.privacy || {};
         payload.submittedAt = new Date().toISOString();
         payload.source = "Formsmith Custom Forms general inquiry form";
-        payload.privacyPolicyPath = privacy.policyPath || "privacy.html";
+        payload.privacyPolicyPath = privacy.policyPath || "privacy/";
         payload.privacyPolicyVersion = privacy.policyVersion || "unversioned";
         payload.privacyConsentRecordedAt = payload.submittedAt;
         const requestBody = new URLSearchParams();
