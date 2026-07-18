@@ -1,5 +1,22 @@
-// Google Analytics (GA4) - gtag.js for getformsmith.com
-(function(){var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-TKHRMCW79P";document.head.appendChild(s);window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};window.gtag("js",new Date());window.gtag("config","G-TKHRMCW79P");})();
+// Load analytics after the critical page experience so it cannot delay first render.
+(function () {
+  function loadAnalytics() {
+    var script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.googletagmanager.com/gtag/js?id=G-TKHRMCW79P";
+    document.head.appendChild(script);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", "G-TKHRMCW79P");
+  }
+  function scheduleAnalytics() {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(loadAnalytics, { timeout: 2500 });
+    else window.setTimeout(loadAnalytics, 0);
+  }
+  if (document.readyState === "complete") scheduleAnalytics();
+  else window.addEventListener("load", scheduleAnalytics, { once: true });
+})();
 
 (function () {
   "use strict";
@@ -210,7 +227,7 @@
         const featuredSlug = data.projects.find((project) => project.featured)?.slug;
         projects = projects
           .filter((project) => project.homepage && project.slug !== featuredSlug)
-          .sort((a, b) => (a.homepageOrder || 99) - (b.homepageOrder || 99));
+          .sort((a, b) => (a.homepageOrder ?? 99) - (b.homepageOrder ?? 99));
       }
       if (mode === "demos") projects = projects.filter((project) => project.demo && project.demo.url && !project.demo.placeholder);
       const limit = Number(mount.dataset.limit || 0);

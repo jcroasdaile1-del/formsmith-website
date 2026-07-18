@@ -163,6 +163,70 @@ window.FORMSMITH_DATA = {
       technology: ["Interactive browser demo"]
     },
     {
+      slug: "photography-studio-manager",
+      title: "Photography Studio Manager",
+      demoName: "Daylight Studio",
+      shortTitle: "Daylight Studio",
+      industry: "Photography",
+      status: "Live Demo",
+      classification: "Concept Demo",
+      featured: false,
+      homepage: true,
+      homepageOrder: 0,
+      eyebrow: "Interactive Demo",
+      theme: "amber",
+      summary:
+        "A polished studio command center for turning new photography inquiries into organized leads, clients, scheduled sessions, prepared shoots, and delivery follow-ups.",
+      overview:
+        "Photography Studio Manager demonstrates how an independent photographer or small studio could guide each relationship from a public inquiry through lead follow-up, client and session planning, schedule management, shoot readiness, and final delivery.",
+      problem:
+        "Inquiry details, client preferences, session dates, location notes, shot plans, and delivery commitments can become difficult to track when they are spread across messages, calendars, forms, and separate documents.",
+      previousProcess:
+        "This concept represents a common photography workflow built around website inquiries, email or text follow-up, a separate calendar, handwritten shoot notes, and manually maintained client folders rather than a claimed client process.",
+      solution:
+        "One connected workspace can turn a submitted inquiry into a working lead, carry approved details into the client and session record, and keep the schedule, shoot-readiness tasks, and delivery status visible through completion.",
+      features: [
+        "Public inquiry form",
+        "Lead pipeline",
+        "Client records",
+        "Session scheduling",
+        "Studio calendar",
+        "Package and payment tracking",
+        "Shoot-readiness checklists",
+        "Session notes and timelines",
+        "Gallery delivery tracking",
+        "Business activity dashboard"
+      ],
+      demo: {
+        url: "photography-studio/index.html",
+        label: "Launch Daylight Studio Demo",
+        external: false,
+        placeholder: false,
+        notice: "Uses fictional inquiries, clients, sessions, payments, and delivery information."
+      },
+      detailPath: "projects/photography-studio-manager.html",
+      screenshots: [
+        {
+          src: "portfolio-assets/daylight-dashboard.png?v=20260718-3",
+          alt: "Daylight Studio dashboard showing sample photography inquiries, booked revenue, shoot readiness, upcoming sessions, and gallery deliveries",
+          caption: "A daily studio view centered on the next shoot and the work that needs attention",
+          width: 1440,
+          height: 900,
+          placeholder: false
+        },
+        {
+          src: "portfolio-assets/daylight-inquiry.png?v=20260718-3",
+          alt: "Daylight Studio shoot-details inquiry step with selected wedding coverage priorities, must-have moments, and accessibility planning notes beside an editorial photograph",
+          caption: "Shoot-ready priorities and planning details that flow into the studio pipeline",
+          width: 1440,
+          height: 900,
+          placeholder: false
+        }
+      ],
+      screenshotPlaceholder: null,
+      technology: ["Interactive browser demo"]
+    },
+    {
       slug: "powerwash-pro",
       title: "PowerWash Pro",
       demoName: "PowerWash Pro",

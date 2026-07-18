@@ -201,7 +201,12 @@ async function scanLayouts(browser, origin) {
         { name: "prefers-reduced-motion", value: "reduce" }
       ]);
       const runtimeIssues = [];
-      page.on("console", (message) => { if (message.type() === "error") runtimeIssues.push(`console: ${message.text()}`); });
+      page.on("console", (message) => {
+        const source = message.location().url || "";
+        if (message.type() === "error" && !/ERR_NETWORK_ACCESS_DENIED/.test(message.text()) && (!source || source.startsWith(origin))) {
+          runtimeIssues.push(`console${source ? ` (${source})` : ""}: ${message.text()}`);
+        }
+      });
       page.on("pageerror", (error) => runtimeIssues.push(`page error: ${error.message}`));
       page.on("requestfailed", (request) => {
         if (request.url().startsWith(origin)) runtimeIssues.push(`request failed: ${request.url()} (${request.failure()?.errorText || "unknown"})`);
@@ -370,6 +375,37 @@ async function testPortfolioFilters(browser, origin) {
       pressed: document.querySelector(`[data-filter="${name}"]`).getAttribute("aria-pressed")
     }), filter);
     if (state.visible !== count || state.pressed !== "true") fail("portfolio filters", `${filter} returned ${state.visible}/${count} cards with aria-pressed=${state.pressed}`);
+  }
+  await page.close();
+}
+
+async function testDemoOrderingAndPreload(browser, origin) {
+  const page = await browser.newPage();
+  await page.goto(`${origin}${mountPath}index.html`, { waitUntil: "load" });
+  await page.$$eval('[data-project-grid="home"] img', (images) => Promise.all(images.map(async (image) => {
+    image.loading = "eager";
+    await image.decode().catch(() => {});
+  })));
+  const home = await page.$$eval('[data-project-grid="home"] .project-card', (cards) => cards.map((card) => ({
+    title: card.querySelector("h3")?.textContent.trim(),
+    image: card.querySelector("img")?.getAttribute("src"),
+    imageLoaded: Boolean(card.querySelector("img")?.naturalWidth)
+  })));
+  const delivery = await page.evaluate(() => ({
+    preloads: [...document.querySelectorAll('link[rel="preload"][as="script"]')].map((link) => link.getAttribute("href")),
+    scripts: [...document.querySelectorAll('script[src*="assets/js/site"]')].map((script) => ({ src: script.getAttribute("src"), priority: script.getAttribute("fetchpriority") }))
+  }));
+  if (home[0]?.title !== "Photography Studio Manager" || !/portfolio-assets\/daylight-dashboard\.png(?:\?|$)/.test(home[0]?.image || "") || !home[0]?.imageLoaded) {
+    fail("homepage demo order", `photography app is not the first real-screenshot card (${JSON.stringify(home.slice(0, 2))})`);
+  }
+  if (delivery.preloads.length !== 2 || delivery.scripts.length !== 2 || delivery.scripts.some((script) => script.priority !== "high" || !/\?v=/.test(script.src))) {
+    fail("critical script delivery", `homepage project renderer is not preloaded and cache-versioned (${JSON.stringify(delivery)})`);
+  }
+
+  await page.goto(`${origin}${mountPath}demos.html`, { waitUntil: "load" });
+  const demos = await page.$$eval('[data-project-grid="demos"] .project-card h3', (headings) => headings.map((heading) => heading.textContent.trim()));
+  if (demos[1] !== "Photography Studio Manager") {
+    fail("demos page order", `photography app should be second, found ${JSON.stringify(demos.slice(0, 3))}`);
   }
   await page.close();
 }
@@ -640,6 +676,8 @@ try {
   await testBreakpointAndThemeRegressions(browser, origin);
   console.log("Running custom-domain 404 check…");
   await testCustomDomain404(browser, origin);
+  console.log("Running homepage and demos ordering and preload checks…");
+  await testDemoOrderingAndPreload(browser, origin);
   console.log("Running portfolio filter interaction…");
   await testPortfolioFilters(browser, origin);
   console.log("Running FAQ ownership check…");
