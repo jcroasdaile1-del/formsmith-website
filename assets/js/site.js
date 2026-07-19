@@ -1,6 +1,7 @@
 // Load analytics after the critical page experience so it cannot delay first render.
 (function () {
   function loadAnalytics() {
+    if (window.__formsmithAnalyticsConfigured) return;
     var script = document.createElement("script");
     script.async = true;
     script.src = "https://www.googletagmanager.com/gtag/js?id=G-TKHRMCW79P";
@@ -9,6 +10,7 @@
     window.gtag = function () { window.dataLayer.push(arguments); };
     window.gtag("js", new Date());
     window.gtag("config", "G-TKHRMCW79P");
+    window.__formsmithAnalyticsConfigured = true;
   }
   function scheduleAnalytics() {
     if ("requestIdleCallback" in window) window.requestIdleCallback(loadAnalytics, { timeout: 2500 });
