@@ -239,6 +239,11 @@
         body: encodePayload(serializeForm())
       });
       if (!response.ok) throw new Error(`Submission returned ${response.status}`);
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "generate_lead", {
+          form_name: "quote_request"
+        });
+      }
       form.hidden = true;
       const success = document.querySelector("[data-quote-success]");
       const successTitle = success.querySelector("h2");

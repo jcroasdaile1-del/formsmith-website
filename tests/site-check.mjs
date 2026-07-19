@@ -69,6 +69,8 @@ for (const page of pages) {
     if (!/<meta\s+property="og:description"\s+content="[^"]+"/i.test(html)) fail(page, "missing Open Graph description");
     const openGraphUrl = html.match(/<meta\s+property="og:url"\s+content="([^"]+)"/i)?.[1];
     if (!openGraphUrl || /YOUR-DOMAIN|REPLACE[_-]?ME/i.test(openGraphUrl)) fail(page, "missing or placeholder Open Graph URL");
+    if (/<meta\s+name="robots"\s+content="[^"]*noindex/i.test(html)) fail(page, "canonical page must not use noindex");
+    if (/<title>[^<]*\bmoved\b|This page has moved to/i.test(html)) fail(page, "canonical page contains legacy redirect-stub content");
   }
   if (!/<main\b[^>]*id="main-content"/i.test(html)) fail(page, "missing main-content landmark");
   if (!/class="skip-link"[^>]*href="#main-content"/i.test(html)) fail(page, "missing skip link");
@@ -97,6 +99,17 @@ for (const page of pages) {
       fail(page, `invalid JSON-LD: ${error.message}`);
     }
   }
+}
+
+const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
+if (!homepage.includes('<meta name="google-site-verification" content="nCVhhoy3ZZJ3LjnII79lQBiOBTAcBBpg5Sn8o4FK3ew" />')) {
+  fail("index.html", "missing the permanent Google Search Console verification tag");
+}
+if (!/<script\s+async\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-TKHRMCW79P"><\/script>/i.test(homepage)) {
+  fail("index.html", "GA4 gtag.js must be present in the raw homepage head");
+}
+if (!/gtag\(['"]config['"],\s*['"]G-TKHRMCW79P['"]\)/.test(homepage)) {
+  fail("index.html", "raw homepage does not configure the GA4 property");
 }
 
 for (const demoFile of fs.readdirSync(root).filter((file) => /-demo\.html$/i.test(file))) {

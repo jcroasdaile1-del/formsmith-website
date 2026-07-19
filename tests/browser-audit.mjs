@@ -620,9 +620,13 @@ async function testQuoteWizard(browser, origin) {
   const finalState = await page.evaluate(() => ({
     successHidden: document.querySelector("[data-quote-success]").hidden,
     formHidden: document.querySelector("[data-quote-wizard]").hidden,
-    storage: localStorage.length
+    storage: localStorage.length,
+    leadEvents: (window.dataLayer || []).filter((entry) => {
+      const values = Array.from(entry);
+      return values[0] === "event" && values[1] === "generate_lead" && values[2]?.form_name === "quote_request";
+    }).length
   }));
-  if (finalState.successHidden || !finalState.formHidden || finalState.storage !== initialStorage) fail("quote wizard", `production submission state is incomplete (${JSON.stringify({ ...finalState, initialStorage })})`);
+  if (finalState.successHidden || !finalState.formHidden || finalState.storage !== initialStorage || finalState.leadEvents !== 1) fail("quote wizard", `production submission state or GA4 lead event is incomplete (${JSON.stringify({ ...finalState, initialStorage })})`);
   if (capturedMethod !== "POST" || capturedAccept !== "application/json" || !capturedContentType?.includes("application/x-www-form-urlencoded") || capturedPayload?.website !== "example.com" || capturedPayload?.budgetRange !== "5000-plus" || capturedPayload?.privacyAgreement !== "agreed" || !capturedPayload?.privacyPolicyPath || !capturedPayload?.privacyPolicyVersion || !capturedPayload?.privacyConsentRecordedAt) {
     fail("quote wizard", `endpoint payload omitted method, response header, form encoding, or consent evidence (${JSON.stringify({ capturedMethod, capturedAccept, capturedContentType, capturedPayload })})`);
   }
