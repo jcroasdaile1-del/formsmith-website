@@ -902,6 +902,11 @@ body.menu-is-open {
   max-width: var(--shell-narrow);
 }
 
+.review-page .page-hero--compact .page-hero__center,
+.review-page main > .section {
+  padding-block: clamp(2rem, 4vw, 3.25rem);
+}
+
 .review-signature {
   display: grid;
   margin-top: 1.5rem;
@@ -4327,7 +4332,9 @@ input[type="radio"] + .choice-control {
   .legal-nav strong,
   .progress-heading strong,
   .progress-help span,
-  .review-section dd {
+  .review-section dd,
+  .hero-testimonial figcaption strong,
+  .review-signature strong {
     color: var(--text);
   }
 
