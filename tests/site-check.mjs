@@ -14,6 +14,7 @@ const marketingPageNames = ["demos", "portfolio", "industries", "pricing", "abou
 const pages = [
   "index.html",
   ...marketingPageNames.map((name) => `${name}/index.html`),
+  "reviews/terri-haas/index.html",
   "404.html",
   ...(data?.projects || []).map((project) => project.detailPath)
 ];
@@ -102,6 +103,9 @@ for (const page of pages) {
 }
 
 const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
+if (!/class="hero-testimonial"/.test(homepage) || !/Read Terri's full review/.test(homepage) || !/href="reviews\/terri-haas\/"/.test(homepage)) {
+  fail("index.html", "Terri's homepage testimonial card or review link is missing");
+}
 if (!homepage.includes('<meta name="google-site-verification" content="nCVhhoy3ZZJ3LjnII79lQBiOBTAcBBpg5Sn8o4FK3ew" />')) {
   fail("index.html", "missing the permanent Google Search Console verification tag");
 }
@@ -110,6 +114,14 @@ if (!/<script\s+async\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=
 }
 if (!/gtag\(['"]config['"],\s*['"]G-TKHRMCW79P['"]\)/.test(homepage)) {
   fail("index.html", "raw homepage does not configure the GA4 property");
+}
+
+const terriReview = fs.readFileSync(path.join(root, "reviews/terri-haas/index.html"), "utf8");
+if ((terriReview.match(/<article\b[\s\S]*?<p>/g) || []).length < 1 || (terriReview.match(/<p>/g) || []).length !== 6) {
+  fail("reviews/terri-haas/index.html", "Terri's review must contain the six supplied body paragraphs");
+}
+if (!/Terri Haas[\s\S]*Buckskin Bowmen Archery Club[\s\S]*Saukville, WI/.test(terriReview) || !/href="\.\.\/\.\.\/quote\/#quote-form"/.test(terriReview)) {
+  fail("reviews/terri-haas/index.html", "Terri's signature or Request a Quote CTA is missing");
 }
 
 for (const demoFile of fs.readdirSync(root).filter((file) => /-demo\.html$/i.test(file))) {

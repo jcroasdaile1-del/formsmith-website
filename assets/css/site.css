@@ -843,6 +843,78 @@ body.menu-is-open {
   background: var(--ink-950);
 }
 
+.hero-showcase {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-testimonial {
+  position: relative;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 1.65rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.hero-testimonial::before {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--primary-700);
+  font-size: 2rem;
+  font-weight: 850;
+  line-height: 0.75;
+  content: "\201C";
+}
+
+.hero-testimonial blockquote {
+  margin-bottom: 1rem;
+  color: var(--muted-strong);
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+.hero-testimonial figcaption {
+  display: grid;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.hero-testimonial figcaption strong {
+  color: var(--ink-900);
+}
+
+.hero-testimonial .text-link {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
+
+.review-body p {
+  margin-bottom: 1rem;
+  color: var(--muted-strong);
+}
+
+.review-shell {
+  max-width: var(--shell-narrow);
+}
+
+.review-signature {
+  display: grid;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.review-signature strong {
+  color: var(--ink-900);
+}
+
 .hero-visual__note,
 .hero-float-card,
 .mockup-note {

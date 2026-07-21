@@ -24,6 +24,7 @@ const pages = [
   "contact/",
   "quote/",
   "privacy/",
+  "reviews/terri-haas/",
   "404.html",
   ...projectData.map((project) => project.detailPath)
 ];
